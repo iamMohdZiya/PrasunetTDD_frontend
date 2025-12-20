@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 interface Course {
   id: string;
   title: string;
+  description: string;
 }
 
 const MentorDashboard = () => {
@@ -14,15 +15,20 @@ const MentorDashboard = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Form States
+  // Course Form States (Create / Edit)
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editCourseId, setEditCourseId] = useState('');
+
+  // Chapter Form States
   const [selectedCourseId, setSelectedCourseId] = useState<string>('');
   const [chapterTitle, setChapterTitle] = useState('');
   const [contentUrl, setContentUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState(''); // NEW: Image Support
   const [sequence, setSequence] = useState(1);
 
+  // Assign Student State
   const [assignEmail, setAssignEmail] = useState('');
 
   useEffect(() => {
@@ -38,20 +44,60 @@ const MentorDashboard = () => {
     }
   };
 
-  const handleCreateCourse = async (e: React.FormEvent) => {
+  // --- COURSE MANAGEMENT (CREATE / UPDATE / DELETE) ---
+
+  const handleCreateOrUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/courses', { title, description });
-      alert('✅ Course Created!');
+      if (isEditing) {
+        // UPDATE Existing Course
+        await api.put(`/courses/${editCourseId}`, { title, description });
+        alert('✅ Course Updated!');
+        setIsEditing(false);
+        setEditCourseId('');
+      } else {
+        // CREATE New Course
+        await api.post('/courses', { title, description });
+        alert('✅ Course Created!');
+      }
+      // Reset Form
       setTitle(''); setDescription('');
       fetchMyCourses();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to create course');
+      alert(err.response?.data?.message || 'Operation failed');
     } finally {
       setLoading(false);
     }
   };
+
+  const startEdit = () => {
+    if (!selectedCourseId) return;
+    const courseToEdit = courses.find(c => c.id === selectedCourseId);
+    if (courseToEdit) {
+      setTitle(courseToEdit.title);
+      setDescription(courseToEdit.description || '');
+      setEditCourseId(selectedCourseId);
+      setIsEditing(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to form
+    }
+  };
+
+  const handleDeleteCourse = async () => {
+    if (!selectedCourseId) return;
+    if (!window.confirm("⚠️ Are you sure? This will delete the course, all chapters, and student progress.")) return;
+
+    try {
+      await api.delete(`/courses/${selectedCourseId}`);
+      alert('🗑️ Course Deleted');
+      setSelectedCourseId(''); 
+      fetchMyCourses(); 
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete');
+    }
+  };
+
+  // --- CONTENT MANAGEMENT (CHAPTERS) ---
 
   const handleAddChapter = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,16 +107,19 @@ const MentorDashboard = () => {
       await api.post(`/courses/${selectedCourseId}/chapters`, {
         title: chapterTitle,
         sequenceOrder: sequence,
-        contentUrl: contentUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        contentUrl: contentUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        imageUrl: imageUrl || '' 
       });
       alert('✅ Chapter Added!');
-      setChapterTitle(''); setContentUrl(''); setSequence(prev => prev + 1);
+      setChapterTitle(''); setContentUrl(''); setImageUrl(''); setSequence(prev => prev + 1);
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to add chapter');
     } finally {
       setLoading(false);
     }
   };
+
+  // --- STUDENT ASSIGNMENT ---
 
   const handleAssignStudent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,20 +138,6 @@ const MentorDashboard = () => {
     }
   };
 
-  const handleDeleteCourse = async () => {
-    if (!selectedCourseId) return;
-    if (!window.confirm("⚠️ Are you sure? This will delete the course, all chapters, and student progress.")) return;
-
-    try {
-      await api.delete(`/courses/${selectedCourseId}`);
-      alert('🗑️ Course Deleted');
-      setSelectedCourseId(''); // Reset selection
-      fetchMyCourses(); // Refresh list
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="flex justify-between items-center mb-8 bg-white p-4 rounded shadow">
@@ -115,10 +150,13 @@ const MentorDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* 1. Create Course */}
-        <div className="bg-white p-6 rounded shadow border-l-4 border-blue-500">
-          <h2 className="text-xl font-bold mb-4">1. Create Course</h2>
-          <form onSubmit={handleCreateCourse} className="space-y-4">
+        {/* SECTION 1: CREATE / EDIT COURSE */}
+        <div className={`bg-white p-6 rounded shadow border-l-4 ${isEditing ? 'border-yellow-500' : 'border-blue-500'}`}>
+          <h2 className="text-xl font-bold mb-4">
+            {isEditing ? '✏️ Edit Course' : '1. Create Course'}
+          </h2>
+          
+          <form onSubmit={handleCreateOrUpdate} className="space-y-4">
             <input 
               placeholder="Course Title" 
               className="w-full border p-2 rounded" 
@@ -129,27 +167,50 @@ const MentorDashboard = () => {
               className="w-full border p-2 rounded h-24" 
               value={description} onChange={e => setDescription(e.target.value)} required 
             />
-            <button disabled={loading} className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
-              {loading ? 'Creating...' : 'Create Course'}
-            </button>
+            
+            <div className="flex gap-2">
+              <button disabled={loading} className={`flex-1 text-white p-2 rounded ${isEditing ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'}`}>
+                {loading ? 'Processing...' : (isEditing ? 'Update Course' : 'Create Course')}
+              </button>
+              
+              {isEditing && (
+                <button 
+                  type="button" 
+                  onClick={() => { setIsEditing(false); setTitle(''); setDescription(''); setEditCourseId(''); }}
+                  className="bg-gray-200 text-gray-700 px-4 rounded hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
-        {/* 2. Manage Course Content */}
+        {/* SECTION 2: MANAGE CONTENT */}
         <div className="space-y-8">
           
-          {/* Select Course Dropdown */}
+          {/* SELECTOR & ACTIONS */}
           <div className="bg-white p-6 rounded shadow">
             <h2 className="text-xl font-bold mb-4">Select Working Course</h2>
             <div className="flex gap-2">
                 <select 
-                className="w-full border p-2 rounded"
-                value={selectedCourseId}
-                onChange={(e) => setSelectedCourseId(e.target.value)}
+                  className="w-full border p-2 rounded"
+                  value={selectedCourseId}
+                  onChange={(e) => setSelectedCourseId(e.target.value)}
                 >
-                <option value="">-- Choose Course --</option>
-                {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                  <option value="">-- Choose Course --</option>
+                  {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
                 </select>
+                
+                <button 
+                    onClick={startEdit}
+                    disabled={!selectedCourseId}
+                    className="bg-yellow-100 text-yellow-700 px-3 rounded hover:bg-yellow-200 border border-yellow-300"
+                    title="Edit Course Details"
+                >
+                    ✏️
+                </button>
+                
                 <button 
                     onClick={handleDeleteCourse}
                     disabled={!selectedCourseId}
@@ -161,7 +222,7 @@ const MentorDashboard = () => {
             </div>
           </div>
 
-          {/* Add Chapter */}
+          {/* ADD CHAPTER FORM */}
           <div className="bg-white p-6 rounded shadow border-l-4 border-green-500">
             <h2 className="text-xl font-bold mb-4">2. Add Chapter</h2>
             <form onSubmit={handleAddChapter} className="space-y-4">
@@ -172,10 +233,16 @@ const MentorDashboard = () => {
                 disabled={!selectedCourseId} required 
               />
               <input 
-                placeholder="Video URL" 
+                placeholder="Video Link (YouTube/Drive)" 
                 className="w-full border p-2 rounded" 
                 value={contentUrl} onChange={e => setContentUrl(e.target.value)} 
                 disabled={!selectedCourseId} required 
+              />
+               <input 
+                placeholder="Image URL (Optional Diagram/Thumbnail)" 
+                className="w-full border p-2 rounded" 
+                value={imageUrl} onChange={e => setImageUrl(e.target.value)} 
+                disabled={!selectedCourseId} 
               />
               <div className="flex items-center gap-2">
                 <label>Sequence:</label>
@@ -192,7 +259,7 @@ const MentorDashboard = () => {
             </form>
           </div>
 
-          {/* Assign Student */}
+          {/* ASSIGN STUDENT FORM */}
           <div className="bg-white p-6 rounded shadow border-l-4 border-purple-500">
             <h2 className="text-xl font-bold mb-4">3. Assign Student</h2>
             <form onSubmit={handleAssignStudent} className="flex gap-2">

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; // Import this to read the role immediately
 
 const Login = () => {
@@ -71,6 +71,9 @@ const Login = () => {
         <button className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition duration-200">
           Sign In
         </button>
+        <p className="mt-4 text-center">
+  Don't have an account? <Link to="/register" className="text-blue-600">Register</Link>
+</p>
       </form>
     </div>
   );

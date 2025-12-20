@@ -7,6 +7,7 @@ interface Chapter {
   title: string;
   sequence_order: number;
   content_url?: string;
+  image_url?: string; // NEW: Image Support
 }
 
 interface Course {
@@ -15,23 +16,29 @@ interface Course {
   description: string;
 }
 
+interface ProgressStat {
+  courseId: string;
+  percentage: number;
+}
+
 const StudentDashboard = () => {
-  // FIXED: We now use 'user' in the UI below to satisfy TypeScript
   const { user, logout } = useAuth();
   
-  // Views: "list" = All Courses, "view" = Single Course Player
+  // Views
   const [view, setView] = useState<'list' | 'view'>('list');
   
-  // Data
+  // Data State
   const [assignedCourses, setAssignedCourses] = useState<Course[]>([]);
+  const [progressStats, setProgressStats] = useState<Record<string, number>>({}); // NEW: Stores % per course
   const [activeCourse, setActiveCourse] = useState<Course | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   
-  // Track completed sequence numbers
+  // Lock Logic
   const [completedOrders, setCompletedOrders] = useState<number[]>([]); 
 
   useEffect(() => {
     fetchAssignedCourses();
+    fetchProgress(); // Load progress bars
   }, []);
 
   const fetchAssignedCourses = async () => {
@@ -43,13 +50,27 @@ const StudentDashboard = () => {
     }
   };
 
+  const fetchProgress = async () => {
+    try {
+      const res = await api.get('/progress/my');
+      // Convert Array to Map: { 'courseId': 50 }
+      const statsMap: Record<string, number> = {};
+      res.data.forEach((p: ProgressStat) => {
+        statsMap[p.courseId] = p.percentage;
+      });
+      setProgressStats(statsMap);
+    } catch (err) {
+      console.error("Progress load error", err);
+    }
+  };
+
   const openCourse = async (course: Course) => {
     try {
       const res = await api.get(`/courses/${course.id}`);
       setActiveCourse(res.data.course);
       setChapters(res.data.chapters);
       
-      // Initialize progress (assuming starting at 0 for this session)
+      // Reset local session progress tracking (ideally fetched from backend in a real app)
       setCompletedOrders([0]); 
       
       setView('view');
@@ -68,8 +89,11 @@ const StudentDashboard = () => {
       });
       alert(`🎉 Chapter ${chapter.sequence_order} Completed!`);
       
-      // Update local lock state
+      // Unlock next
       setCompletedOrders((prev) => [...prev, chapter.sequence_order]);
+      
+      // Refresh global progress stats in background
+      fetchProgress();
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error completing chapter');
     }
@@ -79,7 +103,6 @@ const StudentDashboard = () => {
     if (!activeCourse) return;
     try {
       const res = await api.get(`/certificates/${activeCourse.id}`, { responseType: 'blob' });
-      // Create a blob link to download
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -91,15 +114,14 @@ const StudentDashboard = () => {
     }
   };
 
-  // --- VIEW 1: COURSE LIST ---
+  // --- VIEW 1: ALL COURSES LIST ---
   if (view === 'list') {
     return (
       <div className="min-h-screen bg-gray-100 p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">🎓 My Learning</h1>
-            {/* FIXED: Using 'user' here satisfies the linter */}
-            <p className="text-gray-500">Welcome back, {user?.userId}</p>
+            <p className="text-gray-500">Welcome, {user?.userId}</p>
           </div>
           <button onClick={logout} className="text-gray-600 underline">Logout</button>
         </div>
@@ -107,19 +129,36 @@ const StudentDashboard = () => {
         {assignedCourses.length === 0 ? (
           <div className="text-center py-20 bg-white rounded shadow">
             <h2 className="text-xl text-gray-500">No courses assigned yet.</h2>
-            <p className="text-gray-400">Ask your mentor to assign you to a course!</p>
+            <p className="text-gray-400">Wait for your mentor to assign you a course.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {assignedCourses.map(course => (
-              <div key={course.id} className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <h2 className="text-xl font-bold mb-2 text-blue-600">{course.title}</h2>
-                <p className="text-gray-600 mb-4 h-12 overflow-hidden">{course.description}</p>
+              <div key={course.id} className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition flex flex-col justify-between">
+                <div>
+                  <h2 className="text-xl font-bold mb-2 text-blue-600">{course.title}</h2>
+                  <p className="text-gray-600 mb-4 h-12 overflow-hidden text-sm">{course.description}</p>
+                  
+                  {/* NEW: VISUAL PROGRESS BAR */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="font-bold text-gray-500">Progress</span>
+                      <span className="font-bold text-blue-600">{progressStats[course.id] || 0}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-500" 
+                        style={{ width: `${progressStats[course.id] || 0}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
                 <button 
                   onClick={() => openCourse(course)}
-                  className="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700"
+                  className="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 mt-2"
                 >
-                  Start Learning
+                  Continue Learning
                 </button>
               </div>
             ))}
@@ -129,13 +168,10 @@ const StudentDashboard = () => {
     );
   }
 
-  // --- VIEW 2: COURSE PLAYER ---
-  // FIXED: Removed unused 'maxCompleted' variable entirely
-  
+  // --- VIEW 2: COURSE CONTENT PLAYER ---
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white shadow p-4 flex justify-between items-center px-8">
+      <div className="bg-white shadow p-4 flex justify-between items-center px-8 sticky top-0 z-10">
         <div>
           <button onClick={() => setView('list')} className="text-sm text-gray-500 hover:text-black mb-1">
             ← Back to Dashboard
@@ -150,26 +186,23 @@ const StudentDashboard = () => {
         </button>
       </div>
 
-      {/* Content */}
       <div className="flex-1 max-w-4xl mx-auto w-full p-8">
         <div className="space-y-6">
           {chapters.map((chapter) => {
-            // LOGIC: Is this chapter unlocked?
-            // Unlocked if it is Chapter 1 OR if previous chapter (order-1) is in completed list
             const isUnlocked = chapter.sequence_order === 1 || completedOrders.includes(chapter.sequence_order - 1);
             const isCompleted = completedOrders.includes(chapter.sequence_order);
 
             return (
               <div 
                 key={chapter.id} 
-                className={`border rounded-lg p-6 transition ${
+                className={`border rounded-lg p-6 transition shadow-sm ${
                   isUnlocked ? 'bg-white border-gray-200' : 'bg-gray-100 border-gray-200 opacity-75'
                 }`}
               >
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-sm font-bold px-2 py-1 rounded ${isUnlocked ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-500'}`}>
+                      <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${isUnlocked ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-500'}`}>
                         Chapter {chapter.sequence_order}
                       </span>
                       {!isUnlocked && <span className="text-xs text-red-500 font-bold">🔒 LOCKED</span>}
@@ -181,18 +214,29 @@ const StudentDashboard = () => {
                   {isUnlocked && !isCompleted && (
                     <button 
                       onClick={() => handleComplete(chapter)}
-                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 shadow-sm"
+                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 shadow-sm text-sm"
                     >
                       Mark Complete
                     </button>
                   )}
                 </div>
 
-                {isUnlocked && chapter.content_url && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded border text-blue-600 underline">
-                     <a href={chapter.content_url} target="_blank" rel="noreferrer">
-                       Watch Video / View Content
-                     </a>
+                {isUnlocked && (
+                  <div className="mt-4 space-y-4">
+                    {/* NEW: DISPLAY IMAGE IF EXISTS */}
+                    {chapter.image_url && (
+                        <div className="mb-4">
+                            <img src={chapter.image_url} alt="Chapter Diagram" className="max-w-full h-auto rounded border" />
+                        </div>
+                    )}
+
+                    {chapter.content_url && (
+                      <div className="p-3 bg-blue-50 rounded border border-blue-100 text-blue-700">
+                         🎥 <a href={chapter.content_url} target="_blank" rel="noreferrer" className="underline font-medium hover:text-blue-900">
+                           Watch Video / View Resources
+                         </a>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
