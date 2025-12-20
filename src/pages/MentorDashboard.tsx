@@ -89,6 +89,20 @@ const MentorDashboard = () => {
     }
   };
 
+  const handleDeleteCourse = async () => {
+    if (!selectedCourseId) return;
+    if (!window.confirm("⚠️ Are you sure? This will delete the course, all chapters, and student progress.")) return;
+
+    try {
+      await api.delete(`/courses/${selectedCourseId}`);
+      alert('🗑️ Course Deleted');
+      setSelectedCourseId(''); // Reset selection
+      fetchMyCourses(); // Refresh list
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="flex justify-between items-center mb-8 bg-white p-4 rounded shadow">
@@ -127,14 +141,24 @@ const MentorDashboard = () => {
           {/* Select Course Dropdown */}
           <div className="bg-white p-6 rounded shadow">
             <h2 className="text-xl font-bold mb-4">Select Working Course</h2>
-            <select 
-              className="w-full border p-2 rounded"
-              value={selectedCourseId}
-              onChange={(e) => setSelectedCourseId(e.target.value)}
-            >
-              <option value="">-- Choose Course --</option>
-              {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-            </select>
+            <div className="flex gap-2">
+                <select 
+                className="w-full border p-2 rounded"
+                value={selectedCourseId}
+                onChange={(e) => setSelectedCourseId(e.target.value)}
+                >
+                <option value="">-- Choose Course --</option>
+                {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                </select>
+                <button 
+                    onClick={handleDeleteCourse}
+                    disabled={!selectedCourseId}
+                    className="bg-red-50 text-red-600 px-3 rounded hover:bg-red-100 border border-red-200"
+                    title="Delete Course"
+                >
+                    🗑️
+                </button>
+            </div>
           </div>
 
           {/* Add Chapter */}
