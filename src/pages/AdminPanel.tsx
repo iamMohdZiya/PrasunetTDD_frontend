@@ -71,139 +71,188 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8 bg-white p-4 rounded shadow">
-        <div>
-          <h1 className="text-2xl font-bold text-red-700">🛡️ Admin Control Panel</h1>
-          <p className="text-gray-500 text-sm">System Administrator: {user?.userId}</p>
+    <div className="min-h-screen bg-[#0f172a] font-sans text-slate-300 selection:bg-blue-500 selection:text-white">
+      
+      {/* 1. Top Navigation Bar (Dark Theme) */}
+      <nav className="bg-[#1e293b]/50 backdrop-blur-md border-b border-slate-700/50 px-8 py-4 flex justify-between items-center sticky top-0 z-20">
+        <div className="flex items-center gap-3">
+          <div className="bg-blue-600 h-8 w-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-900/20">A</div>
+          <div>
+            <h1 className="font-bold text-lg tracking-tight text-white">Admin Console</h1>
+            <p className="text-xs text-slate-400 font-mono">ID: {user?.userId}</p>
+          </div>
         </div>
-        <button onClick={logout} className="text-gray-600 hover:text-red-600 font-medium">
-          Logout
-        </button>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6">
         <button 
-          onClick={() => setActiveTab('users')}
-          className={`px-6 py-2 rounded-full font-bold transition ${
-            activeTab === 'users' ? 'bg-red-600 text-white' : 'bg-white text-gray-600'
-          }`}
+          onClick={logout} 
+          className="text-sm bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-4 py-2 rounded-lg transition-all hover:text-white hover:border-slate-600"
         >
-          👥 User Approvals
+          Sign Out
         </button>
-        <button 
-          onClick={() => setActiveTab('internships')}
-          className={`px-6 py-2 rounded-full font-bold transition ${
-            activeTab === 'internships' ? 'bg-red-600 text-white' : 'bg-white text-gray-600'
-          }`}
-        >
-          📊 Internship Overview
-        </button>
-      </div>
+      </nav>
 
-      {/* Content Area */}
-      <div className="bg-white rounded-lg shadow overflow-hidden min-h-[400px]">
-        {loading ? (
-          <div className="p-10 text-center text-gray-500">Loading data...</div>
-        ) : (
-          <>
-            {/* VIEW 1: USER MANAGEMENT */}
-            {activeTab === 'users' && (
-              <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-100 text-gray-600 uppercase text-sm">
-                  <tr>
-                    <th className="p-4 border-b">Email</th>
-                    <th className="p-4 border-b">Role</th>
-                    <th className="p-4 border-b">Status</th>
-                    <th className="p-4 border-b">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(u => (
-                    <tr key={u.id} className="hover:bg-gray-50 border-b last:border-0">
-                      <td className="p-4 font-medium">{u.email}</td>
-                      <td className="p-4">
-                        <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
-                          u.role === 'mentor' ? 'bg-purple-100 text-purple-700' : 
-                          u.role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                        }`}>
-                          {u.role}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        {u.role === 'mentor' ? (
-                          u.is_approved ? 
-                          <span className="text-green-600 flex items-center gap-1">✅ Active</span> : 
-                          <span className="text-orange-500 flex items-center gap-1">⏳ Pending</span>
-                        ) : <span className="text-gray-400">-</span>}
-                      </td>
-                      <td className="p-4 flex gap-2">
-                        {u.role === 'mentor' && !u.is_approved && (
-                          <button 
-                            onClick={() => approveMentor(u.id)}
-                            className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 shadow"
-                          >
-                            Approve
-                          </button>
-                        )}
-                        <button 
-                            onClick={() => deleteUser(u.id)}
-                            className="bg-red-50 text-red-600 px-3 py-1 rounded text-sm hover:bg-red-100 border border-red-200"
-                        >
-                            Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+      <main className="max-w-7xl mx-auto px-6 py-10">
+        
+        {/* 2. Header & Tabs */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
+          <div>
+            <h2 className="text-3xl font-bold text-white tracking-tight">System Overview</h2>
+            <p className="text-slate-400 mt-1">Manage platform users and monitor internship statistics.</p>
+          </div>
+          
+          <div className="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+            <button 
+              onClick={() => setActiveTab('users')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === 'users' 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              👥 User Management
+            </button>
+            <button 
+              onClick={() => setActiveTab('internships')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === 'internships' 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              📊 Internship Stats
+            </button>
+          </div>
+        </div>
 
-            {/* VIEW 2: INTERNSHIP STATISTICS */}
-            {activeTab === 'internships' && (
-              <div className="p-6">
-                {stats.length === 0 ? (
-                  <p className="text-center text-gray-500">No internships created yet.</p>
-                ) : (
-                  <div className="grid gap-6">
-                    {stats.map(course => (
-                      <div key={course.courseId} className="border rounded-lg p-4 hover:shadow-md transition">
-                        <div className="flex justify-between items-start mb-4 border-b pb-4">
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-800">{course.title}</h3>
-                            <p className="text-sm text-gray-500">Mentor: <span className="font-medium text-purple-600">{course.mentorEmail}</span></p>
-                          </div>
-                          <div className="text-right">
-                            <span className="block text-3xl font-bold text-blue-600">{course.studentCount}</span>
-                            <span className="text-xs text-gray-500 uppercase tracking-wide">Students Enrolled</span>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-bold text-sm text-gray-700 mb-2">Student List:</h4>
-                          {course.students.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                              {course.students.map((email, idx) => (
-                                <span key={idx} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm border">
-                                  {email}
-                                </span>
-                              ))}
+        {/* 3. Content Area */}
+        <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 shadow-xl overflow-hidden min-h-[500px] backdrop-blur-sm">
+          {loading ? (
+             <div className="flex flex-col items-center justify-center h-96 text-slate-500">
+               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-4"></div>
+               <p className="text-sm font-medium">Loading system data...</p>
+             </div>
+          ) : (
+            <>
+              {/* VIEW A: USER TABLE */}
+              {activeTab === 'users' && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-slate-900/50 text-slate-400 uppercase text-xs font-bold tracking-wider border-b border-slate-700">
+                      <tr>
+                        <th className="p-6">User Identity</th>
+                        <th className="p-6">Role</th>
+                        <th className="p-6">Status</th>
+                        <th className="p-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700/50">
+                      {users.map(u => (
+                        <tr key={u.id} className="hover:bg-slate-700/30 transition-colors group">
+                          <td className="p-6">
+                            <div className="font-medium text-white">{u.email}</div>
+                            <div className="text-xs text-slate-500 font-mono mt-1">ID: {u.id.substring(0, 8)}...</div>
+                          </td>
+                          <td className="p-6">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
+                              u.role === 'mentor' 
+                                ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' 
+                                : u.role === 'admin' 
+                                ? 'bg-red-500/10 text-red-400 border-red-500/20' 
+                                : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                            }`}>
+                              {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
+                            </span>
+                          </td>
+                          <td className="p-6">
+                            {u.role === 'mentor' ? (
+                              u.is_approved ? 
+                              <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
+                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span> 
+                                Active
+                              </div> : 
+                              <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
+                                <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span> 
+                                Pending
+                              </div>
+                            ) : <span className="text-slate-600 text-sm">-</span>}
+                          </td>
+                          <td className="p-6 text-right space-x-3 opacity-80 group-hover:opacity-100 transition-opacity">
+                            {u.role === 'mentor' && !u.is_approved && (
+                              <button 
+                                onClick={() => approveMentor(u.id)}
+                                className="text-xs bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                              >
+                                ✓ Approve
+                              </button>
+                            )}
+                            <button 
+                                onClick={() => deleteUser(u.id)}
+                                className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                            >
+                                Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* VIEW B: INTERNSHIP STATS GRID */}
+              {activeTab === 'internships' && (
+                <div className="p-8">
+                  {stats.length === 0 ? (
+                    <div className="text-center py-20 bg-slate-800/30 rounded-xl border border-slate-700/50 border-dashed">
+                      <div className="text-5xl mb-4 opacity-20">📊</div>
+                      <h3 className="text-lg font-medium text-slate-300">No active internships found</h3>
+                      <p className="text-slate-500 text-sm mt-1">Platform statistics will appear here once mentors create courses.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {stats.map(course => (
+                        <div key={course.courseId} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800 transition-all hover:border-blue-500/30 group">
+                          <div className="flex justify-between items-start mb-6">
+                            <div>
+                              <h3 className="font-bold text-lg text-white line-clamp-1 group-hover:text-blue-400 transition-colors" title={course.title}>
+                                {course.title}
+                              </h3>
+                              <p className="text-xs text-slate-500 mt-1">
+                                Mentor: <span className="text-slate-300 font-medium">{course.mentorEmail}</span>
+                              </p>
                             </div>
-                          ) : (
-                            <p className="text-sm text-gray-400 italic">No students assigned yet.</p>
-                          )}
+                            <div className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-2 rounded-lg text-center min-w-[70px]">
+                              <span className="block text-2xl font-bold leading-none">{course.studentCount}</span>
+                              <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Enrolled</span>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                              Students <div className="h-px bg-slate-700 flex-1"></div>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2">
+                              {course.students.length > 0 ? (
+                                course.students.map((email, idx) => (
+                                  <span key={idx} className="bg-slate-900/50 text-slate-400 px-2 py-1 rounded text-xs border border-slate-700/50 truncate max-w-[150px]" title={email}>
+                                    {email}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-xs text-slate-600 italic">No students assigned yet</span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </main>
     </div>
   );
 };

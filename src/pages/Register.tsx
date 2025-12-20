@@ -21,9 +21,8 @@ const Register = () => {
     setLoading(true);
 
     try {
-      
       await api.post('/auth/register', {
-        fullName, 
+        fullName,
         email,
         password,
         role
@@ -43,109 +42,131 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">Create Account</h2>
-        <p className="text-center text-gray-500 mb-6">Join the Learning Management System</p>
+    <div className="min-h-screen flex bg-[#0f172a] text-slate-300 font-sans selection:bg-blue-500 selection:text-white">
+      
+      {/* LEFT SIDE: Branding & Testimonials (Hidden on mobile) */}
+      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-blue-900 to-slate-900 relative overflow-hidden">
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-8">
+            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xl">L</div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">LMS Platform</h1>
+          </div>
+          <h2 className="text-4xl font-extrabold text-white leading-tight mb-4">
+            Start your learning <br /> journey today.
+          </h2>
+          <p className="text-lg text-blue-200 max-w-md">
+            Join thousands of students and mentors managing projects, tracking progress, and earning certificates in real-time.
+          </p>
+        </div>
         
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm border border-red-200">
-            {error}
-          </div>
-        )}
+        {/* Subtle Grid Pattern Background */}
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+        
+        <div className="relative z-10 text-sm text-blue-300">
+          © 2024 Internship LMS. All rights reserved.
+        </div>
+      </div>
 
-        <form onSubmit={handleRegister} className="space-y-4">
+      {/* RIGHT SIDE: Registration Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-[#0f172a]">
+        <div className="w-full max-w-md space-y-8">
           
-          {/* NEW: Full Name Input */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Full Name</label>
-            <input 
-              type="text" 
-              className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="John Doe"
-              required
-            />
+          <div className="text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-white mb-2">Create an account</h2>
+            <p className="text-slate-400">Enter your details to get started.</p>
           </div>
 
-          {/* Email Input */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Email Address</label>
-            <input 
-              type="email" 
-              className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          {/* Password Input */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Password</label>
-            <input 
-              type="password" 
-              className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          {/* Role Selection */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">I am a:</label>
-            <div className="flex gap-4">
-              <label className={`flex-1 flex items-center justify-center p-3 rounded border cursor-pointer transition ${role === 'student' ? 'bg-blue-50 border-blue-500 text-blue-700 font-bold' : 'border-gray-200 hover:bg-gray-50'}`}>
-                <input 
-                  type="radio" 
-                  name="role" 
-                  value="student" 
-                  checked={role === 'student'} 
-                  onChange={() => setRole('student')}
-                  className="hidden" 
-                />
-                🎓 Student
-              </label>
-              
-              <label className={`flex-1 flex items-center justify-center p-3 rounded border cursor-pointer transition ${role === 'mentor' ? 'bg-purple-50 border-purple-500 text-purple-700 font-bold' : 'border-gray-200 hover:bg-gray-50'}`}>
-                <input 
-                  type="radio" 
-                  name="role" 
-                  value="mentor" 
-                  checked={role === 'mentor'} 
-                  onChange={() => setRole('mentor')}
-                  className="hidden" 
-                />
-                👨‍🏫 Mentor
-              </label>
+          {error && (
+            <div className="bg-red-500/10 border-l-4 border-red-500 text-red-400 p-4 rounded text-sm flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {error}
             </div>
-          </div>
-
-          {role === 'mentor' && (
-            <p className="text-xs text-purple-600 bg-purple-50 p-2 rounded">
-              ℹ️ Note: Mentor accounts require Admin approval before you can access the dashboard.
-            </p>
           )}
 
-          <button 
-            disabled={loading}
-            className={`w-full text-white p-3 rounded font-medium transition ${
-              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            {loading ? 'Creating Account...' : 'Sign Up'}
-          </button>
-        </form>
+          <form onSubmit={handleRegister} className="space-y-6">
+            
+            {/* Role Selection Cards */}
+            <div className="grid grid-cols-2 gap-4">
+              <div 
+                onClick={() => setRole('student')}
+                className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${role === 'student' ? 'border-blue-500 bg-blue-500/10 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-slate-700 hover:border-slate-500 bg-slate-800/50'}`}
+              >
+                <span className="text-2xl">🎓</span>
+                <span className="font-medium text-sm">Student</span>
+              </div>
+              <div 
+                onClick={() => setRole('mentor')}
+                className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${role === 'mentor' ? 'border-purple-500 bg-purple-500/10 text-white shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'border-slate-700 hover:border-slate-500 bg-slate-800/50'}`}
+              >
+                <span className="text-2xl">👨‍🏫</span>
+                <span className="font-medium text-sm">Mentor</span>
+              </div>
+            </div>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link to="/" className="text-blue-600 font-medium hover:underline">
-            Log in here
-          </Link>
+            {/* Inputs Group */}
+            <div className="space-y-4">
+              <div className="group">
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
+                <input 
+                  type="text" 
+                  className="w-full bg-slate-800/50 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-600"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="John Doe"
+                  required
+                />
+              </div>
+
+              <div className="group">
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
+                <input 
+                  type="email" 
+                  className="w-full bg-slate-800/50 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-600"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  required
+                />
+              </div>
+
+              <div className="group">
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Password</label>
+                <input 
+                  type="password" 
+                  className="w-full bg-slate-800/50 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-600"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a strong password"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Mentor Warning */}
+            {role === 'mentor' && (
+              <div className="text-xs text-purple-300 bg-purple-900/20 border border-purple-500/20 p-3 rounded-lg flex gap-2">
+                ℹ️ Mentor accounts require manual approval from an administrator before access is granted.
+              </div>
+            )}
+
+            <button 
+              disabled={loading}
+              className={`w-full py-3.5 rounded-lg font-bold text-white transition-all duration-200 transform active:scale-[0.98] ${
+                loading 
+                  ? 'bg-slate-700 cursor-wait' 
+                  : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-lg shadow-blue-500/30'
+              }`}
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-slate-400">
+            Already have an account?{' '}
+            <Link to="/" className="text-blue-400 hover:text-blue-300 font-medium hover:underline transition-colors">
+              Log in
+            </Link>
+          </p>
         </div>
       </div>
     </div>
