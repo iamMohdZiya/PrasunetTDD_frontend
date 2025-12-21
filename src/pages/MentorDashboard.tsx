@@ -8,6 +8,7 @@ interface Course {
 }
 
 const MentorDashboard = () => {
+  // ✅ FIX: We are now using 'user' in the JSX below
   const { logout, user } = useAuth();
   
   // Data States
@@ -105,6 +106,7 @@ const MentorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 font-sans text-slate-900">
+      
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -114,7 +116,21 @@ const MentorDashboard = () => {
               <p className="text-xs text-slate-500">Instructor Dashboard</p>
             </div>
           </div>
-          <button onClick={logout} className="text-sm bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg font-medium transition-all">Sign Out</button>
+          
+          {/* ✅ FIX: Added User Profile Section here to use the 'user' variable */}
+          <div className="flex items-center gap-4">
+            <div className="text-right border-r border-slate-200 pr-4 hidden md:block">
+              <p className="text-xs text-slate-500 font-mono">ID: {user?.userId?.slice(0, 8).toUpperCase()}</p>
+              <p className="text-sm font-semibold text-slate-900">Mentor</p>
+            </div>
+            <button 
+              onClick={logout} 
+              className="text-sm bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg font-medium transition-all"
+            >
+              Sign Out
+            </button>
+          </div>
+
         </div>
       </nav>
 
