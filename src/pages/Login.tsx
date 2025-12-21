@@ -39,10 +39,10 @@ const Login = () => {
   const fillDemoCredentials = (role: 'student' | 'mentor' | 'admin') => {
     if (role === 'student') {
       setEmail('student@example.com');
-      setPassword('password123');
+      setPassword('student@123');
     } else if (role === 'mentor') {
       setEmail('mentor@example.com');
-      setPassword('password123');
+      setPassword('mentor@123');
     } else if (role === 'admin') {
       setEmail('admin@example.com');
       setPassword('password123');

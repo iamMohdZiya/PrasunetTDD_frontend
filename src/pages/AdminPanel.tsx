@@ -13,9 +13,22 @@ interface User {
 interface CourseStat {
   courseId: string;
   title: string;
+  mentorId: string;
   mentorEmail: string;
-  studentCount: number;
-  students: string[];
+  mentorName: string;
+  totalChapters: number;
+  totalStudents: number;
+  studentsCompleted: number;
+  studentsNotCompleted: number;
+  studentDetails: Array<{
+    studentId: string;
+    studentEmail: string;
+    studentName: string;
+    completed: number;
+    total: number;
+    percentage: number;
+    isCompleted: boolean;
+  }>;
 }
 
 const AdminPanel = () => {
@@ -224,54 +237,102 @@ const AdminPanel = () => {
                       <p className="text-slate-600 text-sm mt-1">Platform statistics will appear once mentors create courses</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="space-y-8">
                       {stats.map(course => (
-                        <div 
-                          key={course.courseId} 
-                          className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 rounded-xl p-6 hover:border-red-400 hover:shadow-lg transition-all group"
-                        >
-                          {/* Course Title */}
-                          <div className="mb-5">
-                            <h3 className="font-bold text-slate-900 text-lg line-clamp-2 group-hover:text-red-600 transition-colors">
-                              {course.title}
-                            </h3>
-                            <p className="text-xs text-slate-600 mt-1">
-                              by <span className="font-semibold text-slate-900">{course.mentorEmail}</span>
-                            </p>
-                          </div>
+                        <div key={course.courseId} className="border-2 border-slate-200 rounded-xl overflow-hidden">
+                          {/* Course Header */}
+                          <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white p-6">
+                            <div className="flex justify-between items-start mb-4">
+                              <div>
+                                <h3 className="font-bold text-2xl">{course.title}</h3>
+                                <p className="text-red-100 text-sm mt-1">
+                                  by <span className="font-semibold">{course.mentorName}</span> ({course.mentorEmail})
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-3xl font-bold">{course.totalChapters}</div>
+                                <div className="text-red-100 text-xs">Total Chapters</div>
+                              </div>
+                            </div>
 
-                          {/* Stats */}
-                          <div className="mb-6">
-                            <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg p-4 text-center">
-                              <div className="text-3xl font-bold">{course.studentCount}</div>
-                              <div className="text-xs font-semibold mt-1 uppercase tracking-wider opacity-90">Students Enrolled</div>
+                            {/* Overview Stats */}
+                            <div className="grid grid-cols-4 gap-3 mt-4">
+                              <div className="bg-white/20 backdrop-blur rounded-lg p-3 text-center">
+                                <div className="text-2xl font-bold">{course.totalStudents}</div>
+                                <div className="text-xs text-red-100">Total Enrolled</div>
+                              </div>
+                              <div className="bg-green-500/20 backdrop-blur rounded-lg p-3 text-center">
+                                <div className="text-2xl font-bold">{course.studentsCompleted}</div>
+                                <div className="text-xs text-red-100">Completed</div>
+                              </div>
+                              <div className="bg-amber-500/20 backdrop-blur rounded-lg p-3 text-center">
+                                <div className="text-2xl font-bold">{course.studentsNotCompleted}</div>
+                                <div className="text-xs text-red-100">In Progress</div>
+                              </div>
+                              <div className="bg-white/20 backdrop-blur rounded-lg p-3 text-center">
+                                <div className="text-2xl font-bold">
+                                  {course.totalStudents > 0 ? Math.round((course.studentsCompleted / course.totalStudents) * 100) : 0}%
+                                </div>
+                                <div className="text-xs text-red-100">Completion Rate</div>
+                              </div>
                             </div>
                           </div>
 
-                          {/* Student List */}
-                          <div>
-                            <div className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                              👥 Students
-                              <span className="flex-1 h-px bg-slate-300"></span>
-                            </div>
-                            
-                            {course.students.length > 0 ? (
-                              <div className="space-y-2 max-h-40 overflow-y-auto">
-                                {course.students.map((email, idx) => (
-                                  <div 
-                                    key={idx} 
-                                    className="bg-white border border-slate-200 rounded px-3 py-2 text-xs text-slate-600 truncate hover:bg-slate-50"
-                                    title={email}
-                                  >
-                                    📧 {email}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="text-xs text-slate-500 italic bg-slate-50 p-3 rounded">
-                                No students enrolled yet
-                              </div>
-                            )}
+                          {/* Student Details Table */}
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="bg-slate-50 border-b border-slate-200">
+                                  <th className="px-4 py-3 text-left font-bold text-slate-900">Student</th>
+                                  <th className="px-4 py-3 text-center font-bold text-slate-900">Progress</th>
+                                  <th className="px-4 py-3 text-center font-bold text-slate-900">Chapters</th>
+                                  <th className="px-4 py-3 text-center font-bold text-slate-900">Status</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-200">
+                                {course.studentDetails.length === 0 ? (
+                                  <tr>
+                                    <td colSpan={4} className="px-4 py-6 text-center text-slate-500 italic">No students enrolled</td>
+                                  </tr>
+                                ) : (
+                                  course.studentDetails.map((student, idx) => (
+                                    <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                      <td className="px-4 py-3">
+                                        <div className="font-medium text-slate-900">{student.studentName}</div>
+                                        <div className="text-xs text-slate-500">{student.studentEmail}</div>
+                                      </td>
+                                      <td className="px-4 py-3">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-24 bg-slate-200 h-2 rounded-full overflow-hidden">
+                                            <div 
+                                              className="bg-blue-600 h-full transition-all" 
+                                              style={{ width: `${student.percentage}%` }}
+                                            ></div>
+                                          </div>
+                                          <div className="text-xs font-bold text-slate-700 w-12 text-right">{student.percentage}%</div>
+                                        </div>
+                                      </td>
+                                      <td className="px-4 py-3 text-center">
+                                        <div className="inline-flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full text-xs font-bold">
+                                          <span className="text-slate-600">{student.completed}</span>
+                                          <span className="text-slate-500">/</span>
+                                          <span className="text-slate-600">{student.total}</span>
+                                        </div>
+                                      </td>
+                                      <td className="px-4 py-3 text-center">
+                                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
+                                          student.isCompleted 
+                                            ? 'bg-green-100 text-green-700' 
+                                            : 'bg-amber-100 text-amber-700'
+                                        }`}>
+                                          {student.isCompleted ? '✅ Completed' : '⏳ In Progress'}
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  ))
+                                )}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       ))}

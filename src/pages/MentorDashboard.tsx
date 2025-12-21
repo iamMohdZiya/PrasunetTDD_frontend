@@ -30,10 +30,36 @@ const MentorDashboard = () => {
   const [sequence, setSequence] = useState(1);
 
   const [assignEmail, setAssignEmail] = useState('');
+  const [chapters, setChapters] = useState<any[]>([]);
+  const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
+  const [editCourseTitle, setEditCourseTitle] = useState('');
+  const [editCourseDesc, setEditCourseDesc] = useState('');
+
+  const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
+  const [editChapterFields, setEditChapterFields] = useState({ title: '', description: '', image_url: '', content_url: '', sequence_order: 1 });
 
   useEffect(() => {
     fetchMyCourses();
   }, []);
+
+  // Fetch chapters when a course is selected
+  useEffect(() => {
+    if (!selectedCourseId) {
+      setChapters([]);
+      return;
+    }
+    fetchChapters(selectedCourseId);
+  }, [selectedCourseId]);
+
+  const fetchChapters = async (courseId: string) => {
+    try {
+      const res = await api.get(`/courses/${courseId}`);
+      setChapters(res.data.chapters || []);
+    } catch (err) {
+      console.error('Failed to load chapters', err);
+      setChapters([]);
+    }
+  };
 
   const fetchMyCourses = async () => {
     try {
@@ -80,10 +106,52 @@ const MentorDashboard = () => {
       setContentUrl(''); 
       setImageUrl('');
       setSequence(prev => prev + 1);
+      // refresh chapters
+      if (selectedCourseId) fetchChapters(selectedCourseId);
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to add chapter');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditChapter = async (chapterId: string) => {
+    const existing = chapters.find(c => String(c.id) === String(chapterId));
+    if (!existing) return alert('Chapter not found');
+    const newTitle = window.prompt('Chapter title:', existing.title);
+    if (newTitle === null) return;
+    const newDesc = window.prompt('Chapter description:', existing.description || '');
+    if (newDesc === null) return;
+    const newImage = window.prompt('Image URL (optional):', existing.image_url || '');
+    if (newImage === null) return;
+    const newContent = window.prompt('Content URL:', existing.content_url || '');
+    if (newContent === null) return;
+    const newSeqStr = window.prompt('Sequence order (number):', String(existing.sequence_order || 1));
+    if (newSeqStr === null) return;
+    const newSeq = Number(newSeqStr);
+    try {
+      await api.put(`/courses/${selectedCourseId}/chapters/${chapterId}`, {
+        title: newTitle,
+        description: newDesc,
+        imageUrl: newImage,
+        contentUrl: newContent,
+        sequenceOrder: newSeq
+      });
+      alert('✅ Chapter updated');
+      if (selectedCourseId) fetchChapters(selectedCourseId);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to update chapter');
+    }
+  };
+
+  const handleDeleteChapter = async (chapterId: string) => {
+    if (!window.confirm('Delete this chapter?')) return;
+    try {
+      await api.delete(`/courses/${selectedCourseId}/chapters/${chapterId}`);
+      alert('🗑️ Chapter deleted');
+      if (selectedCourseId) fetchChapters(selectedCourseId);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete chapter');
     }
   };
 
@@ -101,6 +169,32 @@ const MentorDashboard = () => {
       alert(err.response?.data?.message || 'Failed to assign student');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditCourse = async (courseId: string) => {
+    const newTitle = window.prompt('New course title:');
+    if (newTitle === null) return; // cancelled
+    const newDesc = window.prompt('New course description:', '');
+    try {
+      await api.put(`/courses/${courseId}`, { title: newTitle, description: newDesc });
+      alert('✅ Course updated');
+      fetchMyCourses();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to update course');
+    }
+  };
+
+  const handleDeleteCourse = async (courseId: string) => {
+    if (!window.confirm('Permanently delete this course?')) return;
+    try {
+      await api.delete(`/courses/${courseId}`);
+      alert('🗑️ Course deleted');
+      // If the deleted course was selected, clear selection
+      if (selectedCourseId === courseId) setSelectedCourseId('');
+      fetchMyCourses();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete course');
     }
   };
 
@@ -159,6 +253,41 @@ const MentorDashboard = () => {
               </select>
             </div>
 
+            {/* Course List with actions */}
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {courses.map(c => (
+                <div key={c.id} className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                  {editingCourseId === c.id ? (
+                    <div className="space-y-2">
+                      <input className="w-full px-3 py-2 border rounded" value={editCourseTitle} onChange={e => setEditCourseTitle(e.target.value)} />
+                      <input className="w-full px-3 py-2 border rounded" value={editCourseDesc} onChange={e => setEditCourseDesc(e.target.value)} />
+                      <div className="flex gap-2 justify-end">
+                        <button onClick={() => { setEditingCourseId(null); }} className="px-3 py-1 text-xs bg-slate-200 rounded">Cancel</button>
+                        <button onClick={async () => {
+                          try {
+                            await api.put(`/courses/${c.id}`, { title: editCourseTitle, description: editCourseDesc });
+                            alert('✅ Course updated');
+                            setEditingCourseId(null);
+                            fetchMyCourses();
+                          } catch (err: any) {
+                            alert(err.response?.data?.message || 'Failed to update course');
+                          }
+                        }} className="px-3 py-1 text-xs bg-amber-200 hover:bg-amber-300 rounded">Save</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium truncate mr-3">{c.title}</div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => { setEditingCourseId(c.id); setEditCourseTitle(c.title); setEditCourseDesc((c as any).description || ''); }} className="px-3 py-1 text-xs bg-amber-200 hover:bg-amber-300 rounded">Edit</button>
+                        <button onClick={() => handleDeleteCourse(c.id)} className="px-3 py-1 text-xs bg-red-100 hover:bg-red-200 rounded">Delete</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Add Chapter Form */}
               <div className={`bg-white rounded-xl border-2 border-slate-200 p-6 ${!selectedCourseId ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -197,6 +326,62 @@ const MentorDashboard = () => {
                 </form>
               </div>
             </div>
+
+            {/* Chapters List */}
+            {selectedCourseId && (
+              <div className="mt-6 bg-white rounded-xl border-2 border-slate-200 p-6">
+                <h3 className="font-bold text-slate-900 mb-4">Chapters</h3>
+                <div className="space-y-3">
+                  {chapters.length === 0 && <div className="text-sm text-slate-500 italic">No chapters yet</div>}
+                  {chapters.map(ch => (
+                    <div key={ch.id} className="border rounded p-3 flex justify-between items-start">
+                      {editingChapterId === String(ch.id) ? (
+                        <div className="w-full space-y-2">
+                          <input className="w-full px-3 py-2 border rounded" value={editChapterFields.title} onChange={e => setEditChapterFields({ ...editChapterFields, title: e.target.value })} />
+                          <input className="w-full px-3 py-2 border rounded" value={editChapterFields.description} onChange={e => setEditChapterFields({ ...editChapterFields, description: e.target.value })} />
+                          <input className="w-full px-3 py-2 border rounded" value={editChapterFields.image_url} onChange={e => setEditChapterFields({ ...editChapterFields, image_url: e.target.value })} />
+                          <input className="w-full px-3 py-2 border rounded" value={editChapterFields.content_url} onChange={e => setEditChapterFields({ ...editChapterFields, content_url: e.target.value })} />
+                          <input type="number" className="w-24 px-3 py-2 border rounded" value={editChapterFields.sequence_order} onChange={e => setEditChapterFields({ ...editChapterFields, sequence_order: Number(e.target.value) })} />
+                          <div className="flex gap-2 justify-end">
+                            <button onClick={() => setEditingChapterId(null)} className="px-3 py-1 text-xs bg-slate-200 rounded">Cancel</button>
+                            <button onClick={async () => {
+                              try {
+                                await api.put(`/courses/${selectedCourseId}/chapters/${ch.id}`, {
+                                  title: editChapterFields.title,
+                                  description: editChapterFields.description,
+                                  imageUrl: editChapterFields.image_url,
+                                  contentUrl: editChapterFields.content_url,
+                                  sequenceOrder: editChapterFields.sequence_order
+                                });
+                                alert('✅ Chapter updated');
+                                setEditingChapterId(null);
+                                fetchChapters(selectedCourseId);
+                              } catch (err: any) {
+                                alert(err.response?.data?.message || 'Failed to update chapter');
+                              }
+                            }} className="px-3 py-1 text-xs bg-amber-200 hover:bg-amber-300 rounded">Save</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full flex items-start justify-between">
+                          <div>
+                            <div className="font-semibold">{ch.title} <span className="text-xs text-slate-500">(CH {ch.sequence_order})</span></div>
+                            <div className="text-sm text-slate-600">{ch.description}</div>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            <div className="flex gap-2">
+                              <button onClick={() => { setEditingChapterId(String(ch.id)); setEditChapterFields({ title: ch.title, description: ch.description || '', image_url: ch.image_url || '', content_url: ch.content_url || '', sequence_order: ch.sequence_order || 1 }); }} className="px-3 py-1 text-xs bg-amber-200 hover:bg-amber-300 rounded">Edit</button>
+                              <button onClick={() => handleDeleteChapter(ch.id)} className="px-3 py-1 text-xs bg-red-100 hover:bg-red-200 rounded">Delete</button>
+                            </div>
+                            {ch.image_url && <img src={ch.image_url} alt="thumb" className="w-24 h-16 object-cover rounded" />}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
