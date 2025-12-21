@@ -63,10 +63,25 @@ const StudentDashboard = () => {
       const res = await api.get(`/courses/${course.id}`);
       setActiveCourse(res.data.course);
       setChapters(res.data.chapters);
-      setCompletedOrders([0]); 
+      
+      // ✅ FETCH ACTUAL COMPLETED CHAPTERS FROM BACKEND
+      fetchCompletedChapters(course.id);
+      
       setView('view');
     } catch (err: any) {
       alert(err.response?.data?.message || 'Cannot access course');
+    }
+  };
+
+  const fetchCompletedChapters = async (courseId: string) => {
+    try {
+      const res = await api.get(`/progress/course/${courseId}`);
+      // Backend should return array of completed sequence_order numbers
+      const completed = res.data.completedSequences || [];
+      setCompletedOrders(completed);
+    } catch (err) {
+      console.error("Failed to fetch completed chapters", err);
+      setCompletedOrders([0]); // Default to just first chapter unlocked
     }
   };
 
