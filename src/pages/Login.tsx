@@ -35,6 +35,20 @@ const Login = () => {
     }
   };
 
+  // Helper to fill demo credentials
+  const fillDemoCredentials = (role: 'student' | 'mentor' | 'admin') => {
+    if (role === 'student') {
+      setEmail('student@example.com');
+      setPassword('password123');
+    } else if (role === 'mentor') {
+      setEmail('mentor@example.com');
+      setPassword('password123');
+    } else if (role === 'admin') {
+      setEmail('admin@example.com');
+      setPassword('password123');
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-white font-sans text-slate-900">
       
@@ -47,7 +61,8 @@ const Login = () => {
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-12">
             <div className="bg-white/20 backdrop-blur-md h-10 w-10 rounded-lg flex items-center justify-center font-bold text-lg border border-white/30">📚</div>
-            <span className="font-bold text-2xl tracking-tight">LearnHub</span>
+            {/* UPDATED BRAND NAME */}
+            <span className="font-bold text-2xl tracking-tight">LMS</span>
           </div>
           <h1 className="text-5xl font-extrabold leading-tight mb-6 text-white">
             Master your skills with structured learning.
@@ -74,7 +89,7 @@ const Login = () => {
         </div>
         
         <div className="relative z-10 text-sm text-blue-100">
-          © 2024 LearnHub - Internship Learning Management System
+          © 2024 LMS - Internship Learning Management System
         </div>
       </div>
 
@@ -97,6 +112,36 @@ const Login = () => {
               </div>
             </div>
           )}
+
+          {/* DEMO CREDENTIALS SECTION */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-3 text-center">
+              🚀 Demo Credentials (Click to Fill)
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              <button 
+                type="button"
+                onClick={() => fillDemoCredentials('student')}
+                className="bg-white hover:bg-blue-100 text-blue-700 text-xs font-semibold py-2 px-1 rounded border border-blue-200 transition-colors"
+              >
+                Student
+              </button>
+              <button 
+                type="button"
+                onClick={() => fillDemoCredentials('mentor')}
+                className="bg-white hover:bg-purple-100 text-purple-700 text-xs font-semibold py-2 px-1 rounded border border-purple-200 transition-colors"
+              >
+                Mentor
+              </button>
+              <button 
+                type="button"
+                onClick={() => fillDemoCredentials('admin')}
+                className="bg-white hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-1 rounded border border-slate-300 transition-colors"
+              >
+                Admin
+              </button>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -140,7 +185,7 @@ const Login = () => {
               <div className="w-full border-t border-slate-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gradient-to-b from-slate-50 to-slate-100 text-slate-500">New to LearnHub?</span>
+              <span className="px-2 bg-gradient-to-b from-slate-50 to-slate-100 text-slate-500">New to LMS?</span>
             </div>
           </div>
 
@@ -150,7 +195,7 @@ const Login = () => {
 
           {/* Footer */}
           <div className="mt-12 pt-6 border-t border-slate-200 text-center text-xs text-slate-500">
-            <p className="mb-3">© 2024 LearnHub • Internship Learning Management System</p>
+            <p className="mb-3">© 2024 LMS • Internship Learning Management System</p>
             <div className="flex justify-center gap-4 text-slate-600">
               <a href="#" className="hover:text-blue-600 transition-colors">Privacy</a>
               <span>•</span>
