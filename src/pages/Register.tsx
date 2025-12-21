@@ -42,74 +42,96 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#0f172a] text-slate-300 font-sans selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen flex bg-white font-sans text-slate-900">
       
-      {/* LEFT SIDE: Branding & Testimonials (Hidden on mobile) */}
-      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-blue-900 to-slate-900 relative overflow-hidden">
+      {/* LEFT SIDE: Branding (Hidden on mobile) */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white flex-col justify-between p-16 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48"></div>
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/10 rounded-full -ml-36 -mb-36"></div>
+        
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xl">L</div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">LMS Platform</h1>
+          <div className="flex items-center gap-3 mb-12">
+            <div className="bg-white/20 backdrop-blur-md h-10 w-10 rounded-lg flex items-center justify-center font-bold text-lg border border-white/30">📚</div>
+            <span className="font-bold text-2xl tracking-tight">LearnHub</span>
           </div>
-          <h2 className="text-4xl font-extrabold text-white leading-tight mb-4">
-            Start your learning <br /> journey today.
-          </h2>
-          <p className="text-lg text-blue-200 max-w-md">
-            Join thousands of students and mentors managing projects, tracking progress, and earning certificates in real-time.
+          <h1 className="text-5xl font-extrabold text-white leading-tight mb-6">
+            Start your learning journey today.
+          </h1>
+          <p className="text-pink-100 text-lg max-w-md leading-relaxed">
+            Join thousands of students and mentors. Gain skills, track progress, earn certificates, and grow your career with structured learning.
           </p>
+
+          {/* Stats */}
+          <div className="mt-12 grid grid-cols-2 gap-6">
+            <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20">
+              <div className="text-2xl font-bold text-white">500+</div>
+              <div className="text-pink-100 text-sm">Active Students</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20">
+              <div className="text-2xl font-bold text-white">100+</div>
+              <div className="text-pink-100 text-sm">Expert Mentors</div>
+            </div>
+          </div>
         </div>
         
-        {/* Subtle Grid Pattern Background */}
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-        
-        <div className="relative z-10 text-sm text-blue-300">
-          © 2024 Internship LMS. All rights reserved.
+        <div className="relative z-10 text-sm text-pink-100">
+          © 2024 LearnHub - Professional Learning Management
         </div>
       </div>
 
       {/* RIGHT SIDE: Registration Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-[#0f172a]">
-        <div className="w-full max-w-md space-y-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-gradient-to-b from-slate-50 to-slate-100">
+        <div className="w-full max-w-lg space-y-8">
           
           <div className="text-center lg:text-left">
-            <h2 className="text-3xl font-bold text-white mb-2">Create an account</h2>
-            <p className="text-slate-400">Enter your details to get started.</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">Create your account</h2>
+            <p className="text-slate-600 text-base">Select your role and get started learning</p>
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border-l-4 border-red-500 text-red-400 p-4 rounded text-sm flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              {error}
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg text-sm flex items-center gap-3 shadow-sm">
+              <span className="text-xl">⚠️</span>
+              <span className="font-medium">{error}</span>
             </div>
           )}
 
           <form onSubmit={handleRegister} className="space-y-6">
             
             {/* Role Selection Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <div 
-                onClick={() => setRole('student')}
-                className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${role === 'student' ? 'border-blue-500 bg-blue-500/10 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-slate-700 hover:border-slate-500 bg-slate-800/50'}`}
-              >
-                <span className="text-2xl">🎓</span>
-                <span className="font-medium text-sm">Student</span>
-              </div>
-              <div 
-                onClick={() => setRole('mentor')}
-                className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${role === 'mentor' ? 'border-purple-500 bg-purple-500/10 text-white shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'border-slate-700 hover:border-slate-500 bg-slate-800/50'}`}
-              >
-                <span className="text-2xl">👨‍🏫</span>
-                <span className="font-medium text-sm">Mentor</span>
+            <div className="bg-white rounded-lg p-6 border-2 border-slate-200">
+              <label className="block text-sm font-semibold text-slate-700 mb-4">Select Your Role</label>
+              <div className="grid grid-cols-2 gap-4">
+                <div 
+                  onClick={() => setRole('student')}
+                  className={`cursor-pointer border-2 rounded-xl p-5 flex flex-col items-center justify-center gap-3 transition-all duration-200 transform hover:scale-105 ${role === 'student' ? 'border-blue-500 bg-blue-50 shadow-lg shadow-blue-200/50' : 'border-slate-300 bg-slate-50 hover:border-slate-400'}`}
+                >
+                  <span className="text-4xl">🎓</span>
+                  <div className="text-center">
+                    <div className="font-bold text-sm text-slate-900">Student</div>
+                    <div className="text-xs text-slate-500">Learn & Progress</div>
+                  </div>
+                </div>
+                <div 
+                  onClick={() => setRole('mentor')}
+                  className={`cursor-pointer border-2 rounded-xl p-5 flex flex-col items-center justify-center gap-3 transition-all duration-200 transform hover:scale-105 ${role === 'mentor' ? 'border-purple-500 bg-purple-50 shadow-lg shadow-purple-200/50' : 'border-slate-300 bg-slate-50 hover:border-slate-400'}`}
+                >
+                  <span className="text-4xl">👨‍🏫</span>
+                  <div className="text-center">
+                    <div className="font-bold text-sm text-slate-900">Mentor</div>
+                    <div className="text-xs text-slate-500">Teach & Guide</div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Inputs Group */}
+            {/* Form Inputs */}
             <div className="space-y-4">
-              <div className="group">
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
                 <input 
                   type="text" 
-                  className="w-full bg-slate-800/50 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-600"
+                  className="w-full bg-white border-2 border-slate-200 text-slate-900 px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-400"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
@@ -117,23 +139,23 @@ const Register = () => {
                 />
               </div>
 
-              <div className="group">
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
                 <input 
                   type="email" 
-                  className="w-full bg-slate-800/50 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-600"
+                  className="w-full bg-white border-2 border-slate-200 text-slate-900 px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-400"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
+                  placeholder="you@company.com"
                   required
                 />
               </div>
 
-              <div className="group">
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Password</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
                 <input 
                   type="password" 
-                  className="w-full bg-slate-800/50 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-600"
+                  className="w-full bg-white border-2 border-slate-200 text-slate-900 px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-400"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Create a strong password"
@@ -142,31 +164,51 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Mentor Warning */}
+            {/* Mentor Info Box */}
             {role === 'mentor' && (
-              <div className="text-xs text-purple-300 bg-purple-900/20 border border-purple-500/20 p-3 rounded-lg flex gap-2">
-                ℹ️ Mentor accounts require manual approval from an administrator before access is granted.
+              <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-lg">
+                <div className="flex gap-3">
+                  <span className="text-2xl">ℹ️</span>
+                  <div>
+                    <div className="font-semibold text-slate-900 text-sm">Mentor Account Approval Required</div>
+                    <p className="text-slate-600 text-xs mt-1">Your account will need to be verified by an administrator before you can start creating courses.</p>
+                  </div>
+                </div>
               </div>
             )}
 
             <button 
               disabled={loading}
-              className={`w-full py-3.5 rounded-lg font-bold text-white transition-all duration-200 transform active:scale-[0.98] ${
+              className={`w-full py-3 px-4 rounded-lg text-white font-bold text-base shadow-lg transition-all transform active:scale-95 ${
                 loading 
-                  ? 'bg-slate-700 cursor-wait' 
-                  : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-lg shadow-blue-500/30'
+                  ? 'bg-slate-400 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl'
               }`}
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? '⏳ Creating Account...' : 'Create Account'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-400">
-            Already have an account?{' '}
-            <Link to="/" className="text-blue-400 hover:text-blue-300 font-medium hover:underline transition-colors">
-              Log in
-            </Link>
-          </p>
+          <div className="border-t border-slate-300 pt-6">
+            <p className="text-center text-sm text-slate-600">
+              Already have an account?{' '}
+              <Link to="/" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+                Sign in here
+              </Link>
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-8 pt-6 border-t border-slate-200 text-center text-xs text-slate-500">
+            <p className="mb-3">© 2024 LearnHub • Internship Learning Management System</p>
+            <div className="flex justify-center gap-4 text-slate-600">
+              <a href="#" className="hover:text-purple-600 transition-colors">Privacy</a>
+              <span>•</span>
+              <a href="#" className="hover:text-purple-600 transition-colors">Terms</a>
+              <span>•</span>
+              <a href="#" className="hover:text-purple-600 transition-colors">Support</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

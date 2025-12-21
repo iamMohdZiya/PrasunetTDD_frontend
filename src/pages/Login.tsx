@@ -39,37 +39,58 @@ const Login = () => {
     <div className="min-h-screen flex bg-white font-sans text-slate-900">
       
       {/* LEFT SIDE: Branding (Hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-slate-900 text-white flex-col justify-between p-16">
-        <div>
-          <div className="flex items-center gap-2 mb-10">
-            <div className="bg-blue-600 h-8 w-8 rounded-lg flex items-center justify-center font-bold">L</div>
-            <span className="font-bold text-xl tracking-tight">LMS Platform</span>
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 text-white flex-col justify-between p-16 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48"></div>
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/10 rounded-full -ml-36 -mb-36"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-12">
+            <div className="bg-white/20 backdrop-blur-md h-10 w-10 rounded-lg flex items-center justify-center font-bold text-lg border border-white/30">📚</div>
+            <span className="font-bold text-2xl tracking-tight">LearnHub</span>
           </div>
-          <h1 className="text-5xl font-extrabold leading-tight mb-6">
-            Master your skills <br /> with structured learning.
+          <h1 className="text-5xl font-extrabold leading-tight mb-6 text-white">
+            Master your skills with structured learning.
           </h1>
-          <p className="text-slate-400 text-lg max-w-md leading-relaxed">
-            Join a community of mentors and students. Track your progress, earn certificates, and advance your career.
+          <p className="text-blue-100 text-lg max-w-md leading-relaxed">
+            Join thousands of students and mentors. Track progress, complete courses, and earn certificates in a comprehensive learning ecosystem.
           </p>
+
+          {/* Features */}
+          <div className="mt-12 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">✓</div>
+              <span className="text-blue-50">Sequential chapter progression</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">✓</div>
+              <span className="text-blue-50">Real-time progress tracking</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">✓</div>
+              <span className="text-blue-50">Professional certificates</span>
+            </div>
+          </div>
         </div>
-        <div className="text-sm text-slate-500">
-          © 2024 Internship LMS System
+        
+        <div className="relative z-10 text-sm text-blue-100">
+          © 2024 LearnHub - Internship Learning Management System
         </div>
       </div>
 
       {/* RIGHT SIDE: Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white">
-        <div className="w-full max-w-sm space-y-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-gradient-to-b from-slate-50 to-slate-100">
+        <div className="w-full max-w-md space-y-8">
           
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Sign in to your account</h2>
-            <p className="text-slate-500 mt-2 text-sm">Welcome back! Please enter your details.</p>
+            <h2 className="text-3xl font-bold text-slate-900">Welcome Back</h2>
+            <p className="text-slate-600 mt-2 text-base">Sign in to your account to continue learning</p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm">
               <div className="flex">
-                <div className="flex-shrink-0 text-red-500">⚠️</div>
+                <div className="flex-shrink-0 text-red-500 text-xl">⚠️</div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700 font-medium">{error}</p>
                 </div>
@@ -77,13 +98,13 @@ const Login = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
               <input 
                 type="email" 
                 required
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
+                className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-blue-50 outline-none transition-all text-sm placeholder-slate-400"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -91,11 +112,11 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
               <input 
                 type="password" 
                 required
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
+                className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-blue-50 outline-none transition-all text-sm placeholder-slate-400"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -104,20 +125,40 @@ const Login = () => {
 
             <button 
               disabled={loading}
-              className={`w-full py-3 px-4 rounded-lg text-white font-semibold text-sm shadow-md transition-all ${
-                loading ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'
+              className={`w-full py-3 px-4 rounded-lg text-white font-bold text-base shadow-lg transition-all transform active:scale-95 ${
+                loading 
+                  ? 'bg-slate-400 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl'
               }`}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? '⏳ Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500">
-            Don't have an account?{' '}
-            <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline">
-              Register now
-            </Link>
-          </p>
+          <div className="relative py-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gradient-to-b from-slate-50 to-slate-100 text-slate-500">New to LearnHub?</span>
+            </div>
+          </div>
+
+          <Link to="/register" className="w-full block py-3 px-4 rounded-lg text-center font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 transition-all">
+            Create Account
+          </Link>
+
+          {/* Footer */}
+          <div className="mt-12 pt-6 border-t border-slate-200 text-center text-xs text-slate-500">
+            <p className="mb-3">© 2024 LearnHub • Internship Learning Management System</p>
+            <div className="flex justify-center gap-4 text-slate-600">
+              <a href="#" className="hover:text-blue-600 transition-colors">Privacy</a>
+              <span>•</span>
+              <a href="#" className="hover:text-blue-600 transition-colors">Terms</a>
+              <span>•</span>
+              <a href="#" className="hover:text-blue-600 transition-colors">Support</a>
+            </div>
+          </div>
         </div>
       </div>
 

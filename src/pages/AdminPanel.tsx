@@ -71,177 +71,207 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] font-sans text-slate-300 selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 font-sans">
       
-      {/* 1. Top Navigation Bar (Dark Theme) */}
-      <nav className="bg-[#1e293b]/50 backdrop-blur-md border-b border-slate-700/50 px-8 py-4 flex justify-between items-center sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="bg-blue-600 h-8 w-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-900/20">A</div>
-          <div>
-            <h1 className="font-bold text-lg tracking-tight text-white">Admin Console</h1>
-            <p className="text-xs text-slate-400 font-mono">ID: {user?.userId}</p>
+      {/* Navigation Bar */}
+      <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-20 shadow-sm">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-red-600 to-orange-600 h-10 w-10 rounded-lg flex items-center justify-center text-white font-bold text-lg">⚙️</div>
+            <div>
+              <h1 className="font-bold text-lg text-slate-900">LearnHub Admin</h1>
+              <p className="text-xs text-slate-500">System Administration Console</p>
+            </div>
+          </div>
+          <button 
+            onClick={logout} 
+            className="text-sm bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg transition-all font-medium"
+          >
+            Sign Out
+          </button>
+          <div className="text-right border-l border-slate-200 pl-4">
+            <p className="text-xs text-slate-500 font-mono">ID: {user?.userId?.slice(0, 8).toUpperCase()}</p>
+            <p className="text-sm font-semibold text-slate-900">{user?.role === 'admin' ? 'Admin' : 'User'}</p>
           </div>
         </div>
-        <button 
-          onClick={logout} 
-          className="text-sm bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-4 py-2 rounded-lg transition-all hover:text-white hover:border-slate-600"
-        >
-          Sign Out
-        </button>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      <main className="max-w-7xl mx-auto px-8 py-10">
         
-        {/* 2. Header & Tabs */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
-          <div>
-            <h2 className="text-3xl font-bold text-white tracking-tight">System Overview</h2>
-            <p className="text-slate-400 mt-1">Manage platform users and monitor internship statistics.</p>
-          </div>
-          
-          <div className="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50 backdrop-blur-sm">
-            <button 
-              onClick={() => setActiveTab('users')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                activeTab === 'users' 
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
-              }`}
-            >
-              👥 User Management
-            </button>
-            <button 
-              onClick={() => setActiveTab('internships')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                activeTab === 'internships' 
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
-              }`}
-            >
-              📊 Internship Stats
-            </button>
-          </div>
+        {/* Header Section */}
+        <div className="mb-10">
+          <h2 className="text-3xl font-bold text-slate-900">Platform Administration</h2>
+          <p className="text-slate-600 mt-2">Manage users, approve mentors, and monitor platform analytics</p>
         </div>
 
-        {/* 3. Content Area */}
-        <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 shadow-xl overflow-hidden min-h-[500px] backdrop-blur-sm">
+        {/* Tabs Navigation */}
+        <div className="flex gap-3 mb-8 bg-white rounded-xl border border-slate-200 p-2 shadow-sm w-fit">
+          <button 
+            onClick={() => setActiveTab('users')}
+            className={`px-6 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+              activeTab === 'users' 
+                ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg' 
+                : 'text-slate-700 hover:bg-slate-100'
+            }`}
+          >
+            👥 User Management
+          </button>
+          <button 
+            onClick={() => setActiveTab('internships')}
+            className={`px-6 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+              activeTab === 'internships' 
+                ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg' 
+                : 'text-slate-700 hover:bg-slate-100'
+            }`}
+          >
+            📊 Course Analytics
+          </button>
+        </div>
+
+        {/* Content Area */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-md overflow-hidden">
+          
           {loading ? (
-             <div className="flex flex-col items-center justify-center h-96 text-slate-500">
-               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-4"></div>
-               <p className="text-sm font-medium">Loading system data...</p>
-             </div>
+            <div className="flex flex-col items-center justify-center py-20 text-slate-600">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-red-600 mb-4"></div>
+              <p className="font-medium">Loading system data...</p>
+            </div>
           ) : (
             <>
-              {/* VIEW A: USER TABLE */}
+              {/* USER MANAGEMENT TAB */}
               {activeTab === 'users' && (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-slate-900/50 text-slate-400 uppercase text-xs font-bold tracking-wider border-b border-slate-700">
-                      <tr>
-                        <th className="p-6">User Identity</th>
-                        <th className="p-6">Role</th>
-                        <th className="p-6">Status</th>
-                        <th className="p-6 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-700/50">
-                      {users.map(u => (
-                        <tr key={u.id} className="hover:bg-slate-700/30 transition-colors group">
-                          <td className="p-6">
-                            <div className="font-medium text-white">{u.email}</div>
-                            <div className="text-xs text-slate-500 font-mono mt-1">ID: {u.id.substring(0, 8)}...</div>
-                          </td>
-                          <td className="p-6">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
-                              u.role === 'mentor' 
-                                ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' 
-                                : u.role === 'admin' 
-                                ? 'bg-red-500/10 text-red-400 border-red-500/20' 
-                                : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                            }`}>
-                              {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
-                            </span>
-                          </td>
-                          <td className="p-6">
-                            {u.role === 'mentor' ? (
-                              u.is_approved ? 
-                              <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
-                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span> 
-                                Active
-                              </div> : 
-                              <div className="flex items-center gap-2 text-amber-400 text-sm font-medium">
-                                <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span> 
-                                Pending
-                              </div>
-                            ) : <span className="text-slate-600 text-sm">-</span>}
-                          </td>
-                          <td className="p-6 text-right space-x-3 opacity-80 group-hover:opacity-100 transition-opacity">
-                            {u.role === 'mentor' && !u.is_approved && (
-                              <button 
-                                onClick={() => approveMentor(u.id)}
-                                className="text-xs bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-lg font-medium transition-colors"
-                              >
-                                ✓ Approve
-                              </button>
-                            )}
-                            <button 
-                                onClick={() => deleteUser(u.id)}
-                                className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 px-3 py-1.5 rounded-lg font-medium transition-colors"
-                            >
-                                Delete
-                            </button>
-                          </td>
+                  {users.length === 0 ? (
+                    <div className="text-center py-20">
+                      <div className="text-6xl mb-4 opacity-20">👤</div>
+                      <p className="text-slate-600 font-medium">No users found</p>
+                    </div>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+                          <th className="px-6 py-4 text-left font-bold text-slate-900 uppercase tracking-wider">Email</th>
+                          <th className="px-6 py-4 text-left font-bold text-slate-900 uppercase tracking-wider">Role</th>
+                          <th className="px-6 py-4 text-left font-bold text-slate-900 uppercase tracking-wider">Status</th>
+                          <th className="px-6 py-4 text-right font-bold text-slate-900 uppercase tracking-wider">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {users.map(u => (
+                          <tr key={u.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="font-medium text-slate-900">{u.email}</div>
+                              <div className="text-xs text-slate-500 font-mono mt-1">ID: {u.id.substring(0, 12)}...</div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="inline-flex items-center gap-2">
+                                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${
+                                  u.role === 'mentor' 
+                                    ? 'bg-purple-100 text-purple-700' 
+                                    : u.role === 'admin' 
+                                    ? 'bg-red-100 text-red-700' 
+                                    : 'bg-blue-100 text-blue-700'
+                                }`}>
+                                  {u.role === 'mentor' ? '👨‍🏫' : u.role === 'admin' ? '⚙️' : '🎓'} {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              {u.role === 'mentor' ? (
+                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${
+                                  u.is_approved 
+                                    ? 'bg-green-100 text-green-700' 
+                                    : 'bg-amber-100 text-amber-700'
+                                }`}>
+                                  <span className={`w-2 h-2 rounded-full ${u.is_approved ? 'bg-green-600' : 'bg-amber-600'}`}></span>
+                                  {u.is_approved ? 'Approved' : 'Pending'}
+                                </div>
+                              ) : (
+                                <span className="text-slate-500 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-right space-x-2">
+                              {u.role === 'mentor' && !u.is_approved && (
+                                <button 
+                                  onClick={() => approveMentor(u.id)}
+                                  className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 font-bold text-xs rounded-lg transition-all"
+                                >
+                                  ✓ Approve
+                                </button>
+                              )}
+                              <button 
+                                onClick={() => deleteUser(u.id)}
+                                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-bold text-xs rounded-lg transition-all"
+                              >
+                                🗑️ Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               )}
 
-              {/* VIEW B: INTERNSHIP STATS GRID */}
+              {/* COURSE ANALYTICS TAB */}
               {activeTab === 'internships' && (
                 <div className="p-8">
                   {stats.length === 0 ? (
-                    <div className="text-center py-20 bg-slate-800/30 rounded-xl border border-slate-700/50 border-dashed">
-                      <div className="text-5xl mb-4 opacity-20">📊</div>
-                      <h3 className="text-lg font-medium text-slate-300">No active internships found</h3>
-                      <p className="text-slate-500 text-sm mt-1">Platform statistics will appear here once mentors create courses.</p>
+                    <div className="text-center py-20">
+                      <div className="text-6xl mb-4 opacity-20">📊</div>
+                      <h3 className="text-lg font-bold text-slate-900">No Courses Yet</h3>
+                      <p className="text-slate-600 text-sm mt-1">Platform statistics will appear once mentors create courses</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {stats.map(course => (
-                        <div key={course.courseId} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800 transition-all hover:border-blue-500/30 group">
-                          <div className="flex justify-between items-start mb-6">
-                            <div>
-                              <h3 className="font-bold text-lg text-white line-clamp-1 group-hover:text-blue-400 transition-colors" title={course.title}>
-                                {course.title}
-                              </h3>
-                              <p className="text-xs text-slate-500 mt-1">
-                                Mentor: <span className="text-slate-300 font-medium">{course.mentorEmail}</span>
-                              </p>
-                            </div>
-                            <div className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-2 rounded-lg text-center min-w-[70px]">
-                              <span className="block text-2xl font-bold leading-none">{course.studentCount}</span>
-                              <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Enrolled</span>
+                        <div 
+                          key={course.courseId} 
+                          className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 rounded-xl p-6 hover:border-red-400 hover:shadow-lg transition-all group"
+                        >
+                          {/* Course Title */}
+                          <div className="mb-5">
+                            <h3 className="font-bold text-slate-900 text-lg line-clamp-2 group-hover:text-red-600 transition-colors">
+                              {course.title}
+                            </h3>
+                            <p className="text-xs text-slate-600 mt-1">
+                              by <span className="font-semibold text-slate-900">{course.mentorEmail}</span>
+                            </p>
+                          </div>
+
+                          {/* Stats */}
+                          <div className="mb-6">
+                            <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg p-4 text-center">
+                              <div className="text-3xl font-bold">{course.studentCount}</div>
+                              <div className="text-xs font-semibold mt-1 uppercase tracking-wider opacity-90">Students Enrolled</div>
                             </div>
                           </div>
-                          
+
+                          {/* Student List */}
                           <div>
-                            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                              Students <div className="h-px bg-slate-700 flex-1"></div>
+                            <div className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                              👥 Students
+                              <span className="flex-1 h-px bg-slate-300"></span>
                             </div>
                             
-                            <div className="flex flex-wrap gap-2">
-                              {course.students.length > 0 ? (
-                                course.students.map((email, idx) => (
-                                  <span key={idx} className="bg-slate-900/50 text-slate-400 px-2 py-1 rounded text-xs border border-slate-700/50 truncate max-w-[150px]" title={email}>
-                                    {email}
-                                  </span>
-                                ))
-                              ) : (
-                                <span className="text-xs text-slate-600 italic">No students assigned yet</span>
-                              )}
-                            </div>
+                            {course.students.length > 0 ? (
+                              <div className="space-y-2 max-h-40 overflow-y-auto">
+                                {course.students.map((email, idx) => (
+                                  <div 
+                                    key={idx} 
+                                    className="bg-white border border-slate-200 rounded px-3 py-2 text-xs text-slate-600 truncate hover:bg-slate-50"
+                                    title={email}
+                                  >
+                                    📧 {email}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-xs text-slate-500 italic bg-slate-50 p-3 rounded">
+                                No students enrolled yet
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -252,6 +282,38 @@ const AdminPanel = () => {
             </>
           )}
         </div>
+
+        {/* Professional Footer */}
+        <footer className="bg-white border-t border-slate-200 mt-12">
+          <div className="max-w-7xl mx-auto px-8 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-br from-red-600 to-orange-600 h-10 w-10 rounded-lg flex items-center justify-center text-white font-bold">L</div>
+                <div>
+                  <h3 className="font-bold text-slate-900">LearnHub Admin</h3>
+                  <p className="text-xs text-slate-500">© 2024 All Rights Reserved</p>
+                </div>
+              </div>
+              <div className="flex justify-center items-start">
+                <div>
+                  <h4 className="font-semibold text-slate-900 text-sm mb-3">Quick Links</h4>
+                  <ul className="space-y-2 text-sm text-slate-600">
+                    <li><a href="#" className="hover:text-red-600 transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" className="hover:text-red-600 transition-colors">Terms of Service</a></li>
+                    <li><a href="#" className="hover:text-red-600 transition-colors">Support</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                <p className="text-xs text-slate-500">Version 1.0.0</p>
+                <p className="text-xs font-mono text-slate-500 mt-2">Admin ID: {user?.userId?.slice(0, 12).toUpperCase()}</p>
+              </div>
+            </div>
+            <div className="border-t border-slate-200 pt-4 text-center text-xs text-slate-500">
+              <p>LearnHub Administration Platform • System Management & Oversight</p>
+            </div>
+          </div>
+        </footer>
       </main>
     </div>
   );
