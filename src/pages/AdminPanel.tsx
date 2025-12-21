@@ -84,27 +84,30 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 font-sans text-slate-900">
       
       {/* Navigation Bar */}
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-20 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-red-600 to-orange-600 h-10 w-10 rounded-lg flex items-center justify-center text-white font-bold text-lg">⚙️</div>
+            <div className="bg-gradient-to-br from-red-600 to-orange-600 h-10 w-10 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-red-200 shadow-lg">⚙️</div>
             <div>
-              <h1 className="font-bold text-lg text-slate-900">LearnHub Admin</h1>
-              <p className="text-xs text-slate-500">System Administration Console</p>
+              <h1 className="font-bold text-lg text-slate-900">LMS Admin</h1>
+              <p className="text-xs text-slate-500">System Administration</p>
             </div>
           </div>
-          <button 
-            onClick={logout} 
-            className="text-sm bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg transition-all font-medium"
-          >
-            Sign Out
-          </button>
-          <div className="text-right border-l border-slate-200 pl-4">
-            <p className="text-xs text-slate-500 font-mono">ID: {user?.userId?.slice(0, 8).toUpperCase()}</p>
-            <p className="text-sm font-semibold text-slate-900">{user?.role === 'admin' ? 'Admin' : 'User'}</p>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-right border-r border-slate-200 pr-4 hidden md:block">
+              <p className="text-xs text-slate-500 font-mono">ID: {user?.userId?.slice(0, 8).toUpperCase()}</p>
+              <p className="text-sm font-semibold text-slate-900">Administrator</p>
+            </div>
+            <button 
+              onClick={logout} 
+              className="text-sm bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg transition-all font-medium"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </nav>
@@ -112,112 +115,120 @@ const AdminPanel = () => {
       <main className="max-w-7xl mx-auto px-8 py-10">
         
         {/* Header Section */}
-        <div className="mb-10">
-          <h2 className="text-3xl font-bold text-slate-900">Platform Administration</h2>
-          <p className="text-slate-600 mt-2">Manage users, approve mentors, and monitor platform analytics</p>
-        </div>
+        <div className="mb-8 flex flex-col md:flex-row justify-between items-end gap-4">
+          <div>
+            <h2 className="text-3xl font-bold text-slate-900">Platform Overview</h2>
+            <p className="text-slate-600 mt-1">Manage users, approve mentors, and monitor internship analytics</p>
+          </div>
 
-        {/* Tabs Navigation */}
-        <div className="flex gap-3 mb-8 bg-white rounded-xl border border-slate-200 p-2 shadow-sm w-fit">
-          <button 
-            onClick={() => setActiveTab('users')}
-            className={`px-6 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-              activeTab === 'users' 
-                ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg' 
-                : 'text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            👥 User Management
-          </button>
-          <button 
-            onClick={() => setActiveTab('internships')}
-            className={`px-6 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-              activeTab === 'internships' 
-                ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg' 
-                : 'text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            📊 Course Analytics
-          </button>
+          {/* Tabs Navigation */}
+          <div className="flex bg-white rounded-lg border border-slate-200 p-1 shadow-sm">
+            <button 
+              onClick={() => setActiveTab('users')}
+              className={`px-5 py-2 rounded-md font-semibold text-sm transition-all flex items-center gap-2 ${
+                activeTab === 'users' 
+                  ? 'bg-slate-900 text-white shadow' 
+                  : 'text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              👥 Users
+            </button>
+            <button 
+              onClick={() => setActiveTab('internships')}
+              className={`px-5 py-2 rounded-md font-semibold text-sm transition-all flex items-center gap-2 ${
+                activeTab === 'internships' 
+                  ? 'bg-slate-900 text-white shadow' 
+                  : 'text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              📊 Analytics
+            </button>
+          </div>
         </div>
 
         {/* Content Area */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-md overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm min-h-[500px]">
           
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 text-slate-600">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-red-600 mb-4"></div>
-              <p className="font-medium">Loading system data...</p>
+            <div className="flex flex-col items-center justify-center h-96 text-slate-600">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-red-600 mb-4"></div>
+              <p className="font-medium text-sm">Loading system data...</p>
             </div>
           ) : (
             <>
               {/* USER MANAGEMENT TAB */}
               {activeTab === 'users' && (
-                <div className="overflow-x-auto">
+                <div className="overflow-hidden rounded-xl">
                   {users.length === 0 ? (
-                    <div className="text-center py-20">
+                    <div className="text-center py-32">
                       <div className="text-6xl mb-4 opacity-20">👤</div>
-                      <p className="text-slate-600 font-medium">No users found</p>
+                      <p className="text-slate-600 font-medium">No users found in the system</p>
                     </div>
                   ) : (
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
-                          <th className="px-6 py-4 text-left font-bold text-slate-900 uppercase tracking-wider">Email</th>
-                          <th className="px-6 py-4 text-left font-bold text-slate-900 uppercase tracking-wider">Role</th>
-                          <th className="px-6 py-4 text-left font-bold text-slate-900 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-4 text-right font-bold text-slate-900 uppercase tracking-wider">Actions</th>
+                    <table className="w-full text-sm text-left">
+                      <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs tracking-wider">
+                        <tr>
+                          <th className="px-6 py-4 font-semibold">User Details</th>
+                          <th className="px-6 py-4 font-semibold">Role</th>
+                          <th className="px-6 py-4 font-semibold">Status</th>
+                          <th className="px-6 py-4 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200">
+                      <tbody className="divide-y divide-slate-100">
                         {users.map(u => (
-                          <tr key={u.id} className="hover:bg-slate-50 transition-colors">
+                          <tr key={u.id} className="hover:bg-slate-50/80 transition-colors group">
                             <td className="px-6 py-4">
-                              <div className="font-medium text-slate-900">{u.email}</div>
-                              <div className="text-xs text-slate-500 font-mono mt-1">ID: {u.id.substring(0, 12)}...</div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="inline-flex items-center gap-2">
-                                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${
-                                  u.role === 'mentor' 
-                                    ? 'bg-purple-100 text-purple-700' 
-                                    : u.role === 'admin' 
-                                    ? 'bg-red-100 text-red-700' 
-                                    : 'bg-blue-100 text-blue-700'
-                                }`}>
-                                  {u.role === 'mentor' ? '👨‍🏫' : u.role === 'admin' ? '⚙️' : '🎓'} {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
-                                </span>
+                              <div className="flex items-center gap-3">
+                                <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-slate-200 to-slate-300 flex items-center justify-center text-slate-600 font-bold text-xs">
+                                  {u.email.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                  <div className="font-medium text-slate-900">{u.email}</div>
+                                  <div className="text-xs text-slate-400 font-mono">ID: {u.id.substring(0, 8)}</div>
+                                </div>
                               </div>
                             </td>
                             <td className="px-6 py-4">
+                              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                                u.role === 'mentor' 
+                                  ? 'bg-purple-50 text-purple-700 border-purple-100' 
+                                  : u.role === 'admin' 
+                                  ? 'bg-red-50 text-red-700 border-red-100' 
+                                  : 'bg-blue-50 text-blue-700 border-blue-100'
+                              }`}>
+                                {u.role === 'mentor' ? '👨‍🏫' : u.role === 'admin' ? '🛡️' : '🎓'}
+                                <span className="capitalize">{u.role}</span>
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
                               {u.role === 'mentor' ? (
-                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${
-                                  u.is_approved 
-                                    ? 'bg-green-100 text-green-700' 
-                                    : 'bg-amber-100 text-amber-700'
+                                <div className={`inline-flex items-center gap-1.5 text-xs font-medium ${
+                                  u.is_approved ? 'text-green-600' : 'text-amber-600'
                                 }`}>
-                                  <span className={`w-2 h-2 rounded-full ${u.is_approved ? 'bg-green-600' : 'bg-amber-600'}`}></span>
-                                  {u.is_approved ? 'Approved' : 'Pending'}
+                                  <span className={`w-1.5 h-1.5 rounded-full ${u.is_approved ? 'bg-green-600' : 'bg-amber-600 animate-pulse'}`}></span>
+                                  {u.is_approved ? 'Active' : 'Needs Approval'}
                                 </div>
                               ) : (
-                                <span className="text-slate-500 text-xs">-</span>
+                                <span className="text-slate-400 text-xs">—</span>
                               )}
                             </td>
-                            <td className="px-6 py-4 text-right space-x-2">
-                              {u.role === 'mentor' && !u.is_approved && (
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {u.role === 'mentor' && !u.is_approved && (
+                                  <button 
+                                    onClick={() => approveMentor(u.id)}
+                                    className="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 text-xs rounded-md font-medium transition-colors flex items-center gap-1"
+                                  >
+                                    ✓ Approve
+                                  </button>
+                                )}
                                 <button 
-                                  onClick={() => approveMentor(u.id)}
-                                  className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 font-bold text-xs rounded-lg transition-all"
+                                  onClick={() => deleteUser(u.id)}
+                                  className="px-3 py-1.5 bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 text-xs rounded-md font-medium transition-all"
                                 >
-                                  ✓ Approve
+                                  Delete
                                 </button>
-                              )}
-                              <button 
-                                onClick={() => deleteUser(u.id)}
-                                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-bold text-xs rounded-lg transition-all"
-                              >
-                                🗑️ Delete
-                              </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -233,106 +244,115 @@ const AdminPanel = () => {
                   {stats.length === 0 ? (
                     <div className="text-center py-20">
                       <div className="text-6xl mb-4 opacity-20">📊</div>
-                      <h3 className="text-lg font-bold text-slate-900">No Courses Yet</h3>
-                      <p className="text-slate-600 text-sm mt-1">Platform statistics will appear once mentors create courses</p>
+                      <h3 className="text-lg font-bold text-slate-900">No Courses Data</h3>
+                      <p className="text-slate-500 text-sm mt-1">Analytics will appear here once mentors create content.</p>
                     </div>
                   ) : (
-                    <div className="space-y-8">
+                    <div className="grid grid-cols-1 gap-8">
                       {stats.map(course => (
-                        <div key={course.courseId} className="border-2 border-slate-200 rounded-xl overflow-hidden">
+                        <div key={course.courseId} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                          
                           {/* Course Header */}
-                          <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white p-6">
-                            <div className="flex justify-between items-start mb-4">
+                          <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6">
+                            <div className="flex justify-between items-start">
                               <div>
-                                <h3 className="font-bold text-2xl">{course.title}</h3>
-                                <p className="text-red-100 text-sm mt-1">
-                                  by <span className="font-semibold">{course.mentorName}</span> ({course.mentorEmail})
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-xs font-bold bg-white/10 px-2 py-0.5 rounded text-slate-200">COURSE</span>
+                                  <span className="text-xs text-slate-400 font-mono">{course.courseId.split('-')[0]}</span>
+                                </div>
+                                <h3 className="font-bold text-xl">{course.title}</h3>
+                                <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
+                                  <span className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px]">M</span>
+                                  {course.mentorName || course.mentorEmail}
                                 </p>
                               </div>
-                              <div className="text-right">
-                                <div className="text-3xl font-bold">{course.totalChapters}</div>
-                                <div className="text-red-100 text-xs">Total Chapters</div>
+                              <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                                <div className="text-2xl font-bold">{course.totalChapters}</div>
+                                <div className="text-[10px] text-slate-300 uppercase tracking-wider">Chapters</div>
                               </div>
                             </div>
 
-                            {/* Overview Stats */}
-                            <div className="grid grid-cols-4 gap-3 mt-4">
-                              <div className="bg-white/20 backdrop-blur rounded-lg p-3 text-center">
+                            {/* Key Metrics */}
+                            <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/10">
+                              <div className="text-center">
                                 <div className="text-2xl font-bold">{course.totalStudents}</div>
-                                <div className="text-xs text-red-100">Total Enrolled</div>
+                                <div className="text-xs text-slate-400">Enrolled</div>
                               </div>
-                              <div className="bg-green-500/20 backdrop-blur rounded-lg p-3 text-center">
-                                <div className="text-2xl font-bold">{course.studentsCompleted}</div>
-                                <div className="text-xs text-red-100">Completed</div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-green-400">{course.studentsCompleted}</div>
+                                <div className="text-xs text-slate-400">Graduates</div>
                               </div>
-                              <div className="bg-amber-500/20 backdrop-blur rounded-lg p-3 text-center">
-                                <div className="text-2xl font-bold">{course.studentsNotCompleted}</div>
-                                <div className="text-xs text-red-100">In Progress</div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-amber-400">{course.studentsNotCompleted}</div>
+                                <div className="text-xs text-slate-400">Active</div>
                               </div>
-                              <div className="bg-white/20 backdrop-blur rounded-lg p-3 text-center">
-                                <div className="text-2xl font-bold">
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-blue-400">
                                   {course.totalStudents > 0 ? Math.round((course.studentsCompleted / course.totalStudents) * 100) : 0}%
                                 </div>
-                                <div className="text-xs text-red-100">Completion Rate</div>
+                                <div className="text-xs text-slate-400">Success Rate</div>
                               </div>
                             </div>
                           </div>
 
                           {/* Student Details Table */}
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                              <thead>
-                                <tr className="bg-slate-50 border-b border-slate-200">
-                                  <th className="px-4 py-3 text-left font-bold text-slate-900">Student</th>
-                                  <th className="px-4 py-3 text-center font-bold text-slate-900">Progress</th>
-                                  <th className="px-4 py-3 text-center font-bold text-slate-900">Chapters</th>
-                                  <th className="px-4 py-3 text-center font-bold text-slate-900">Status</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-200">
-                                {course.studentDetails.length === 0 ? (
+                          <div className="bg-slate-50 border-t border-slate-200 p-4">
+                            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">Student Progress</h4>
+                            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                              <table className="w-full text-xs">
+                                <thead className="bg-slate-50 border-b border-slate-200">
                                   <tr>
-                                    <td colSpan={4} className="px-4 py-6 text-center text-slate-500 italic">No students enrolled</td>
+                                    <th className="px-4 py-2 text-left font-medium text-slate-600">Student</th>
+                                    <th className="px-4 py-2 text-center font-medium text-slate-600">Completion</th>
+                                    <th className="px-4 py-2 text-center font-medium text-slate-600">Chapters</th>
+                                    <th className="px-4 py-2 text-right font-medium text-slate-600">Status</th>
                                   </tr>
-                                ) : (
-                                  course.studentDetails.map((student, idx) => (
-                                    <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                                      <td className="px-4 py-3">
-                                        <div className="font-medium text-slate-900">{student.studentName}</div>
-                                        <div className="text-xs text-slate-500">{student.studentEmail}</div>
-                                      </td>
-                                      <td className="px-4 py-3">
-                                        <div className="flex items-center gap-2">
-                                          <div className="w-24 bg-slate-200 h-2 rounded-full overflow-hidden">
-                                            <div 
-                                              className="bg-blue-600 h-full transition-all" 
-                                              style={{ width: `${student.percentage}%` }}
-                                            ></div>
-                                          </div>
-                                          <div className="text-xs font-bold text-slate-700 w-12 text-right">{student.percentage}%</div>
-                                        </div>
-                                      </td>
-                                      <td className="px-4 py-3 text-center">
-                                        <div className="inline-flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full text-xs font-bold">
-                                          <span className="text-slate-600">{student.completed}</span>
-                                          <span className="text-slate-500">/</span>
-                                          <span className="text-slate-600">{student.total}</span>
-                                        </div>
-                                      </td>
-                                      <td className="px-4 py-3 text-center">
-                                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
-                                          student.isCompleted 
-                                            ? 'bg-green-100 text-green-700' 
-                                            : 'bg-amber-100 text-amber-700'
-                                        }`}>
-                                          {student.isCompleted ? '✅ Completed' : '⏳ In Progress'}
-                                        </span>
-                                      </td>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                  {course.studentDetails.length === 0 ? (
+                                    <tr>
+                                      <td colSpan={4} className="px-4 py-4 text-center text-slate-400 italic">No active students</td>
                                     </tr>
-                                  ))
-                                )}
-                              </tbody>
-                            </table>
+                                  ) : (
+                                    course.studentDetails.map((student, idx) => (
+                                      <tr key={idx} className="hover:bg-slate-50">
+                                        <td className="px-4 py-3">
+                                          <div className="font-medium text-slate-900">{student.studentName || 'Student'}</div>
+                                          <div className="text-slate-400 truncate max-w-[150px]">{student.studentEmail}</div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                          <div className="flex items-center gap-2 max-w-[120px] mx-auto">
+                                            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                              <div 
+                                                className={`h-full rounded-full ${student.isCompleted ? 'bg-green-500' : 'bg-blue-500'}`} 
+                                                style={{ width: `${student.percentage}%` }}
+                                              ></div>
+                                            </div>
+                                            <span className="font-bold text-slate-700">{student.percentage}%</span>
+                                          </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                          <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">
+                                            {student.completed}/{student.total}
+                                          </span>
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                          {student.isCompleted ? (
+                                            <span className="text-green-600 font-bold flex items-center justify-end gap-1">
+                                              ✓ Certified
+                                            </span>
+                                          ) : (
+                                            <span className="text-amber-600 font-medium flex items-center justify-end gap-1">
+                                              In Progress
+                                            </span>
+                                          )}
+                                        </td>
+                                      </tr>
+                                    ))
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -344,36 +364,9 @@ const AdminPanel = () => {
           )}
         </div>
 
-        {/* Professional Footer */}
-        <footer className="bg-white border-t border-slate-200 mt-12">
-          <div className="max-w-7xl mx-auto px-8 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-red-600 to-orange-600 h-10 w-10 rounded-lg flex items-center justify-center text-white font-bold">L</div>
-                <div>
-                  <h3 className="font-bold text-slate-900">LearnHub Admin</h3>
-                  <p className="text-xs text-slate-500">© 2024 All Rights Reserved</p>
-                </div>
-              </div>
-              <div className="flex justify-center items-start">
-                <div>
-                  <h4 className="font-semibold text-slate-900 text-sm mb-3">Quick Links</h4>
-                  <ul className="space-y-2 text-sm text-slate-600">
-                    <li><a href="#" className="hover:text-red-600 transition-colors">Privacy Policy</a></li>
-                    <li><a href="#" className="hover:text-red-600 transition-colors">Terms of Service</a></li>
-                    <li><a href="#" className="hover:text-red-600 transition-colors">Support</a></li>
-                  </ul>
-                </div>
-              </div>
-              <div className="flex flex-col items-end">
-                <p className="text-xs text-slate-500">Version 1.0.0</p>
-                <p className="text-xs font-mono text-slate-500 mt-2">Admin ID: {user?.userId?.slice(0, 12).toUpperCase()}</p>
-              </div>
-            </div>
-            <div className="border-t border-slate-200 pt-4 text-center text-xs text-slate-500">
-              <p>LearnHub Administration Platform • System Management & Oversight</p>
-            </div>
-          </div>
+        {/* Footer */}
+        <footer className="mt-12 text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+          <p>© 2024 LMS Admin Console • Authorized Personnel Only</p>
         </footer>
       </main>
     </div>

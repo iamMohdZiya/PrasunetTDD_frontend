@@ -115,35 +115,6 @@ const MentorDashboard = () => {
     }
   };
 
-  const handleEditChapter = async (chapterId: string) => {
-    const existing = chapters.find(c => String(c.id) === String(chapterId));
-    if (!existing) return alert('Chapter not found');
-    const newTitle = window.prompt('Chapter title:', existing.title);
-    if (newTitle === null) return;
-    const newDesc = window.prompt('Chapter description:', existing.description || '');
-    if (newDesc === null) return;
-    const newImage = window.prompt('Image URL (optional):', existing.image_url || '');
-    if (newImage === null) return;
-    const newContent = window.prompt('Content URL:', existing.content_url || '');
-    if (newContent === null) return;
-    const newSeqStr = window.prompt('Sequence order (number):', String(existing.sequence_order || 1));
-    if (newSeqStr === null) return;
-    const newSeq = Number(newSeqStr);
-    try {
-      await api.put(`/courses/${selectedCourseId}/chapters/${chapterId}`, {
-        title: newTitle,
-        description: newDesc,
-        imageUrl: newImage,
-        contentUrl: newContent,
-        sequenceOrder: newSeq
-      });
-      alert('✅ Chapter updated');
-      if (selectedCourseId) fetchChapters(selectedCourseId);
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to update chapter');
-    }
-  };
-
   const handleDeleteChapter = async (chapterId: string) => {
     if (!window.confirm('Delete this chapter?')) return;
     try {
@@ -169,19 +140,6 @@ const MentorDashboard = () => {
       alert(err.response?.data?.message || 'Failed to assign student');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleEditCourse = async (courseId: string) => {
-    const newTitle = window.prompt('New course title:');
-    if (newTitle === null) return; // cancelled
-    const newDesc = window.prompt('New course description:', '');
-    try {
-      await api.put(`/courses/${courseId}`, { title: newTitle, description: newDesc });
-      alert('✅ Course updated');
-      fetchMyCourses();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to update course');
     }
   };
 
