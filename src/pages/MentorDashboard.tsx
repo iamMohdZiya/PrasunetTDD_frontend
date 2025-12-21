@@ -22,10 +22,9 @@ const MentorDashboard = () => {
   const [selectedCourseId, setSelectedCourseId] = useState<string>('');
   const [chapterTitle, setChapterTitle] = useState('');
   
-  // ✅ FIX 1: Added missing states
+  // Chapter Details
   const [chapterDesc, setChapterDesc] = useState(''); 
   const [imageUrl, setImageUrl] = useState(''); 
-  
   const [contentUrl, setContentUrl] = useState('');
   const [sequence, setSequence] = useState(1);
 
@@ -64,17 +63,17 @@ const MentorDashboard = () => {
     if (!selectedCourseId) return alert('Select a course first!');
     setLoading(true);
     try {
-      // ✅ FIX 2: Sending the new fields to the Backend
+      // Sending data to backend
       await api.post(`/courses/${selectedCourseId}/chapters`, {
         title: chapterTitle,
-        description: chapterDesc,  // <--- Backend needs this!
-        imageUrl: imageUrl,        // <--- Backend needs this!
+        description: chapterDesc, 
+        imageUrl: imageUrl,       
         sequenceOrder: sequence,
         contentUrl: contentUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
       });
       alert('✅ Chapter Added!');
       
-      // Reset Form
+      // Clear Form
       setChapterTitle(''); 
       setChapterDesc(''); 
       setContentUrl(''); 
@@ -106,7 +105,6 @@ const MentorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 font-sans text-slate-900">
-      
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -123,7 +121,7 @@ const MentorDashboard = () => {
       <main className="max-w-7xl mx-auto px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          {/* Create Course Column */}
+          {/* Create Course */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl border-2 border-slate-200 shadow-md p-6 sticky top-28">
               <h3 className="font-bold text-slate-900 mb-4">New Course</h3>
@@ -135,7 +133,7 @@ const MentorDashboard = () => {
             </div>
           </div>
 
-          {/* Manage Column */}
+          {/* Manage Content */}
           <div className="lg:col-span-3 space-y-6">
             <div className="bg-white rounded-xl border-2 border-slate-200 p-6">
               <label className="block font-bold text-xs uppercase text-slate-500 mb-2">Select Course</label>
@@ -146,23 +144,20 @@ const MentorDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
               {/* Add Chapter Form */}
               <div className={`bg-white rounded-xl border-2 border-slate-200 p-6 ${!selectedCourseId ? 'opacity-50 pointer-events-none' : ''}`}>
                 <h3 className="font-bold text-slate-900 mb-4">Add Chapter</h3>
                 <form onSubmit={handleAddChapter} className="space-y-3">
                   <input className="w-full px-4 py-2 border-2 border-slate-200 rounded-lg text-sm" placeholder="Chapter Title" value={chapterTitle} onChange={e => setChapterTitle(e.target.value)} required />
                   
-                  {/* ✅ FIX 3: Added Description Input */}
                   <textarea 
                     className="w-full px-4 py-2 border-2 border-slate-200 rounded-lg text-sm h-20" 
-                    placeholder="Chapter Description (What will they learn?)" 
+                    placeholder="Chapter Description..." 
                     value={chapterDesc} 
                     onChange={e => setChapterDesc(e.target.value)} 
                     required 
                   />
                   
-                  {/* ✅ FIX 4: Added Image URL Input */}
                   <input 
                     className="w-full px-4 py-2 border-2 border-slate-200 rounded-lg text-sm" 
                     placeholder="Image URL (Optional)" 
@@ -185,7 +180,6 @@ const MentorDashboard = () => {
                   <button disabled={loading} className="w-full py-2 bg-blue-600 text-white rounded-lg font-bold text-sm">Assign Access</button>
                 </form>
               </div>
-
             </div>
           </div>
         </div>
